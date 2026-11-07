@@ -1,0 +1,874 @@
+<title>KorbKlug</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: oben Umschalter zwischen zwei getrennten Anwendungen.
+   Kunden-App = Smartphone mit Pitch-Begleiter. Händler-Backend = Web-Oberfläche mit Seitennavigation. */
+:root{
+  --bg:#EEF3EF; --panel:#FFFFFF; --ink:#16241C; --muted:#5B6B62; --line:#D6E0D9;
+  --green:#17804F; --green-soft:#DDF1E5; --green-ink:#0E5A37;
+  --orange:#F07B22; --orange-soft:#FDEBDC; --orange-ink:#A84D0B;
+  --screen:#F7FAF8; --card:#FFFFFF; --frame:#1B2620;
+  --warn:#C7471B; --warn-soft:#FBE3D9;
+  --be-side:#16241C; --be-side-ink:#DDE8E1; --be-side-muted:#8FA398;
+  --display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --body:"Figtree", "Segoe UI", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1612; --panel:#17211B; --ink:#E6EFE9; --muted:#9BAEA3; --line:#2B3A31;
+  --green:#3DBE7F; --green-soft:#1C3A2A; --green-ink:#8FE3B8;
+  --orange:#FF9A4D; --orange-soft:#3A2617; --orange-ink:#FFC08F;
+  --screen:#121B16; --card:#1B2620; --frame:#000;
+  --warn:#FF8A5E; --warn-soft:#3A1F15;
+  --be-side:#0A100D; --be-side-ink:#DDE8E1; --be-side-muted:#7F9488; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1612; --panel:#17211B; --ink:#E6EFE9; --muted:#9BAEA3; --line:#2B3A31;
+  --green:#3DBE7F; --green-soft:#1C3A2A; --green-ink:#8FE3B8;
+  --orange:#FF9A4D; --orange-soft:#3A2617; --orange-ink:#FFC08F;
+  --screen:#121B16; --card:#1B2620; --frame:#000;
+  --warn:#FF8A5E; --warn-soft:#3A1F15;
+  --be-side:#0A100D; --be-side-ink:#DDE8E1; --be-side-muted:#7F9488; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
+button{font:inherit;color:inherit;cursor:pointer}
+button:disabled{cursor:default;opacity:.6}
+button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+/* ---------- Umschalter oben ---------- */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--panel)}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--panel);border-bottom:1px solid var(--line)}
+.topbar-in{max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:16px;padding-block:10px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wordmark{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.02em}
+.wordmark span{color:var(--green)}
+.appswitch{display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:3px;gap:3px;margin-left:auto}
+.appswitch button{border:0;background:none;padding:7px 14px;border-radius:999px;font-weight:600;color:var(--muted);font-size:14px;white-space:nowrap}
+.appswitch button[aria-pressed="true"]{background:var(--ink);color:var(--panel)}
+.demo-pill{font-size:12px;color:var(--muted);white-space:nowrap}
+
+/* ---------- Kunden-App: Bühne ---------- */
+.stage{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:40px;max-width:1180px;margin:0 auto;
+  padding-block:28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));align-items:start}
+.side{min-width:0;display:flex;flex-direction:column;gap:22px;padding-top:8px}
+.claim{font-family:var(--display);font-weight:800;font-size:34px;line-height:1.1;margin:0;max-width:16ch;text-wrap:balance;letter-spacing:-.02em}
+.lede{color:var(--muted);margin:0;max-width:60ch}
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.steps button{width:100%;text-align:left;display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start;
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.steps button:hover{border-color:var(--green)}
+.steps .n{width:32px;height:32px;border-radius:50%;background:var(--green-soft);color:var(--green-ink);display:grid;place-items:center;font-weight:700;font-family:var(--display)}
+.steps b{display:block}
+.steps small{color:var(--muted);font-size:13.5px}
+.bridge{background:var(--ink);color:var(--panel);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.bridge b{font-family:var(--display);font-size:18px}
+.bridge p{margin:0;font-size:14px;opacity:.85}
+.bridge button{align-self:flex-start;border:0;background:var(--green);color:#fff;border-radius:10px;padding:9px 14px;font-weight:700}
+.fine{font-size:12.5px;color:var(--muted);margin:0}
+.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:700;margin:0}
+
+/* ---------- Smartphone ---------- */
+.phone{width:390px;height:min(820px,calc(100vh - 120px));min-height:640px;background:var(--frame);border-radius:46px;padding:12px;box-shadow:0 30px 60px -30px rgba(10,40,25,.45);position:sticky;top:calc(env(safe-area-inset-top,0px) + 84px)}
+.screen{background:var(--screen);border-radius:36px;height:100%;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.status{display:flex;justify-content:space-between;padding:12px 26px 4px;font-size:13px;font-weight:600}
+.appbar{display:flex;justify-content:space-between;align-items:center;padding:6px 18px 10px}
+.logo{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-.02em}
+.logo span{color:var(--green)}
+.tachochip{border:0;background:var(--green-soft);color:var(--green-ink);border-radius:999px;padding:6px 12px;font-weight:700;font-size:13px}
+.content{flex:1;overflow-y:auto;padding:4px 16px 20px;display:flex;flex-direction:column;gap:14px}
+.nav{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--line);background:var(--card);padding:6px 6px 12px}
+.nav button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11.5px;color:var(--muted);padding:6px 0;font-weight:600}
+.nav button svg{width:22px;height:22px}
+.nav button[aria-current="page"]{color:var(--green)}
+h2.t{font-family:var(--display);font-weight:800;font-size:24px;margin:2px 0 0;letter-spacing:-.01em}
+.sub{color:var(--muted);font-size:13.5px;margin:0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px}
+.row{display:flex;align-items:center;gap:10px}
+.grow{flex:1;min-width:0}
+.addbar{display:flex;gap:8px}
+.addbar input{flex:1;min-width:0;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:11px 12px;font:inherit;color:var(--ink)}
+.iconbtn{border:1px solid var(--line);background:var(--card);border-radius:12px;width:44px;height:44px;display:grid;place-items:center;flex:none}
+.iconbtn svg{width:20px;height:20px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:5px 11px;font-size:13px;font-weight:600}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--card);border-color:var(--ink)}
+.items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.items li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.items li:last-child{border-bottom:0}
+.items .nm{font-weight:600}
+.items .u{font-size:12.5px;color:var(--muted)}
+.qty{display:flex;align-items:center;gap:4px}
+.qty button{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);background:var(--card);line-height:1}
+.qty span{min-width:18px;text-align:center;font-weight:700}
+.lock{border:0;background:none;padding:4px;color:var(--muted);display:grid;place-items:center}
+.lock svg{width:18px;height:18px}
+.lock[aria-pressed="true"]{color:var(--orange)}
+.switchrow{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.switch{width:46px;height:28px;border-radius:999px;border:0;background:var(--line);position:relative;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .2s}
+.switch[aria-checked="true"]{background:var(--green)}
+.switch[aria-checked="true"]::after{left:21px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);background:var(--screen);border:1px solid var(--line);border-radius:12px;padding:3px;gap:3px}
+.seg button{border:0;background:none;border-radius:9px;padding:7px 4px;font-size:13px;font-weight:600;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.cta{border:0;background:var(--green);color:#fff;border-radius:14px;padding:14px;font-weight:700;font-size:16px;width:100%}
+.cta.alt{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.hint{font-size:12.5px;color:var(--muted)}
+.reco{background:var(--green);color:#fff;border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.reco.stay{background:var(--ink);color:var(--card)}
+.reco .eb{font-size:12px;text-transform:uppercase;letter-spacing:.09em;font-weight:700;opacity:.85}
+.reco .big{font-family:var(--display);font-weight:800;font-size:34px;line-height:1}
+.reco .title{font-weight:700;font-size:17px}
+.reco .facts{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.reco .facts span{background:rgba(255,255,255,.18);border-radius:8px;padding:4px 8px;font-size:12.5px;font-weight:600}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.opt.best{border-color:var(--green);box-shadow:inset 0 0 0 1px var(--green)}
+.opt .o1{font-weight:700}
+.opt .o2{font-size:12.5px;color:var(--muted)}
+.opt .o3{font-weight:700;text-align:right}
+.opt .o4{font-size:12.5px;color:var(--muted);text-align:right}
+.storehead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.dot{width:10px;height:10px;border-radius:50%;flex:none;display:inline-block}
+.badge{display:inline-block;font-size:11px;font-weight:700;border-radius:6px;padding:2px 6px;margin-left:4px;vertical-align:1px}
+.b-deal{background:var(--orange-soft);color:var(--orange-ink)}
+.b-ai{background:var(--green-soft);color:var(--green-ink)}
+.b-spon{background:var(--line);color:var(--muted)}
+.price{font-weight:700;text-align:right;white-space:nowrap}
+.price s{color:var(--muted);font-weight:400;font-size:12px;margin-right:4px}
+.offers{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.offer{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.offer .pic{height:62px;border-radius:10px;display:grid;place-items:center;font-family:var(--display);font-weight:800;font-size:22px;color:var(--orange-ink);background:var(--orange-soft)}
+.offer .on{font-weight:600;font-size:13.5px;line-height:1.25}
+.offer .op{display:flex;align-items:baseline;gap:6px}
+.offer .op b{font-size:17px}
+.offer .op s{font-size:12px;color:var(--muted)}
+.offer .st{font-size:12px;color:var(--muted)}
+.offer button{border:1px solid var(--green);color:var(--green-ink);background:none;border-radius:10px;padding:6px;font-weight:700;font-size:13px}
+.offer button[disabled]{border-color:var(--line);color:var(--muted);opacity:1}
+.exp{height:6px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:4px}
+.exp i{display:block;height:100%;border-radius:4px}
+.alert{background:var(--warn-soft);color:var(--warn);border-radius:12px;padding:10px 12px;font-size:13.5px;font-weight:600}
+.recipe{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.recipe .hero{height:84px;display:flex;align-items:flex-end;padding:10px 12px;font-family:var(--display);font-weight:800;font-size:19px;color:#fff;line-height:1.1}
+.recipe .bd{padding:12px;display:flex;flex-direction:column;gap:8px}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:12px;border-radius:6px;padding:3px 7px;font-weight:600;background:var(--screen);border:1px solid var(--line)}
+.tag.v{background:var(--green-soft);color:var(--green-ink);border-color:transparent}
+.tag.a{background:var(--orange-soft);color:var(--orange-ink);border-color:transparent}
+.smallbtn{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 10px;font-weight:700;font-size:13px}
+.gauge{display:grid;place-items:center;position:relative}
+.gauge svg{width:220px;height:130px}
+.gauge .gv{position:absolute;bottom:4px;text-align:center}
+.gauge .gv b{font-family:var(--display);font-weight:800;font-size:36px;display:block;line-height:1}
+.gauge .gv span{font-size:12.5px;color:var(--muted)}
+.weeks{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;align-items:end;height:120px}
+.wk{display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end;font-size:12px;color:var(--muted)}
+.wk i{display:block;width:100%;max-width:44px;background:var(--green);border-radius:8px 8px 3px 3px;min-height:4px}
+.wk b{color:var(--ink);font-size:12.5px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+.stat b{font-family:var(--display);font-size:22px;font-weight:800;display:block}
+.stat span{font-size:12.5px;color:var(--muted)}
+.share{background:var(--orange);color:#fff;border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:8px}
+.share b{font-family:var(--display);font-size:20px;font-weight:800;line-height:1.15}
+.share button{align-self:flex-start;border:0;background:#fff;color:var(--orange-ink);border-radius:10px;padding:8px 12px;font-weight:700}
+.toast{position:absolute;left:16px;right:16px;bottom:84px;background:var(--ink);color:var(--card);border-radius:12px;padding:12px 14px;font-weight:600;font-size:14px;opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;z-index:5}
+.toast.show{opacity:1;transform:none}
+.demo-note{font-size:11.5px;color:var(--muted);text-align:center}
+
+/* ---------- Händler-Backend ---------- */
+.be{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:calc(100vh - 60px);max-width:1280px;margin:0 auto}
+.be-side{background:var(--be-side);color:var(--be-side-ink);padding:22px 14px;display:flex;flex-direction:column;gap:20px}
+.be-store{display:flex;flex-direction:column;gap:2px;padding:0 8px}
+.be-store b{font-family:var(--display);font-size:20px}
+.be-store span{font-size:12.5px;color:var(--be-side-muted)}
+.be-nav{display:flex;flex-direction:column;gap:2px}
+.be-nav button{border:0;background:none;color:var(--be-side-ink);text-align:left;padding:10px 12px;border-radius:10px;font-weight:600;display:flex;align-items:center;gap:10px}
+.be-nav button svg{width:18px;height:18px;opacity:.8}
+.be-nav button:hover{background:rgba(255,255,255,.06)}
+.be-nav button[aria-current="page"]{background:var(--green);color:#fff}
+.be-side .fine{color:var(--be-side-muted);padding:0 8px;margin-top:auto}
+.be-main{min-width:0;padding-block:26px 40px;padding-left:28px;padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:18px}
+.be-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.be-head h1{font-family:var(--display);font-weight:800;font-size:30px;margin:0;letter-spacing:-.01em}
+.be-head p{margin:2px 0 0;color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;min-width:0}
+.kpi .v{font-family:var(--display);font-weight:800;font-size:28px;line-height:1.1}
+.kpi .l{font-size:13px;color:var(--muted)}
+.kpi .d{font-size:12.5px;font-weight:700;margin-top:4px}
+.up{color:var(--green)} .down{color:var(--warn)}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;min-width:0}
+.box h3{margin:0 0 12px;font-size:16px;font-family:var(--display);font-weight:600}
+.grid2{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:14px}
+.hbar{display:grid;grid-template-columns:150px minmax(0,1fr) 52px;gap:10px;align-items:center;font-size:13.5px;margin-bottom:8px}
+.hbar .track{height:10px;background:var(--green-soft);border-radius:6px;overflow:hidden}
+.hbar .fill{display:block;height:100%;background:var(--green);border-radius:6px}
+.hbar .val{text-align:right;color:var(--muted)}
+.chance{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;padding:12px 0;border-bottom:1px solid var(--line);align-items:center}
+.chance:last-child{border-bottom:0}
+.chance .cn{font-weight:700}
+.chance .cd{font-size:13px;color:var(--muted);grid-column:1}
+.chance button{grid-row:1/span 2;grid-column:2}
+.btn{border:1px solid var(--line);background:var(--panel);border-radius:10px;padding:8px 12px;font-weight:700;font-size:13.5px}
+.btn.primary{background:var(--green);border-color:var(--green);color:#fff}
+.btn.ghost{background:none}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+table.be-t{width:100%;border-collapse:collapse;font-size:14px;min-width:760px}
+.be-t th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;padding:12px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+.be-t td{padding:10px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+.be-t tr:last-child td{border-bottom:0}
+.be-t td.r,.be-t th.r{text-align:right}
+.be-t input{width:86px;border:1px solid var(--line);background:var(--screen);border-radius:8px;padding:6px 8px;font:inherit;color:var(--ink);text-align:right}
+.rank{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;font-weight:800;font-size:13px;background:var(--line);color:var(--ink)}
+.rank.r1{background:var(--green);color:#fff}
+.pill{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:3px 9px;white-space:nowrap}
+.pill.on{background:var(--orange-soft);color:var(--orange-ink)}
+.pill.reg{background:var(--screen);color:var(--muted);border:1px solid var(--line)}
+.pill.ai{background:var(--green-soft);color:var(--green-ink)}
+.pill.spon{background:var(--ink);color:var(--panel)}
+.pill.pause{background:var(--line);color:var(--muted)}
+.upload{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.upload .drop{flex:1;min-width:240px;border:2px dashed var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:4px}
+.upload .drop b{font-size:15px}
+.progress{display:flex;flex-direction:column;gap:6px;font-size:14px}
+.progress div{display:flex;gap:8px;align-items:center}
+.progress i{width:18px;height:18px;border-radius:50%;border:2px solid var(--line);flex:none;display:grid;place-items:center;font-style:normal;font-size:11px}
+.progress .ok i{background:var(--green);border-color:var(--green);color:#fff}
+.form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;gap:10px;align-items:end}
+.form label{display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--muted);min-width:0}
+.form select,.form input{border:1px solid var(--line);background:var(--screen);border-radius:10px;padding:9px 10px;font:inherit;color:var(--ink);min-width:0}
+.sim{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.simout{display:flex;flex-direction:column;gap:10px}
+.simrow{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.simrow:last-child{border-bottom:0}
+.simbig{font-family:var(--display);font-weight:800;font-size:38px;line-height:1}
+input[type=range]{width:100%;accent-color:var(--green)}
+.comp{display:flex;flex-direction:column;gap:6px}
+.comp div{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:8px;align-items:center;font-size:14px}
+.comp .me{font-weight:800}
+.be-toast{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--panel);border-radius:12px;padding:12px 16px;font-weight:600;opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none;max-width:360px;z-index:20}
+.be-toast.show{opacity:1;transform:none}
+.callout{background:var(--green-soft);color:var(--green-ink);border-radius:12px;padding:12px 14px;font-size:14px}
+.days{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;align-items:end;height:150px}
+.day{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px;font-size:12px;color:var(--muted)}
+.day i{display:block;width:100%;max-width:48px;border-radius:8px 8px 3px 3px;background:var(--green)}
+.day b{color:var(--ink);font-size:12.5px}
+
+@media (max-width:960px){
+  .stage{grid-template-columns:minmax(0,1fr);gap:24px}
+  .phone{order:-1;width:100%;max-width:430px;margin:0 auto;position:static;height:760px;min-height:0}
+  .be{grid-template-columns:minmax(0,1fr)}
+  .be-side{padding:14px max(16px,env(safe-area-inset-left,0px));gap:10px}
+  .be-nav{flex-direction:row;overflow-x:auto}
+  .be-nav button{white-space:nowrap}
+  .be-side .fine{display:none}
+  .be-main{padding-left:max(16px,env(safe-area-inset-left,0px))}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .grid2,.sim{grid-template-columns:minmax(0,1fr)}
+  .form{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:480px){
+  .phone{background:none;padding:0;border-radius:0;box-shadow:none;height:740px}
+  .screen{border-radius:20px;border:1px solid var(--line)}
+  .demo-pill{display:none}
+  .hbar{grid-template-columns:100px minmax(0,1fr) 44px}
+  .claim{font-size:28px}
+}
+@media (max-width:760px){.demo-pill{display:none}}
+@media (max-width:440px){.wordmark{display:none}.appswitch{margin:0 auto}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* Screenshot-Modus für Dokumente (?shot) */
+body.shot::before{display:none}
+body.shot .topbar{display:none}
+body.shot .stage{display:flex;justify-content:center;padding:20px}
+body.shot .side{display:none}
+body.shot .phone{position:static;width:390px!important;height:820px!important;min-height:0;padding:12px!important;background:var(--frame)!important;border-radius:46px!important;box-shadow:none;margin:0}
+body.shot .screen{border-radius:36px!important;border:0!important}
+body.shot .toast{display:none}
+</style>
+
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="wordmark">Korb<span>Klug</span></div>
+    <div class="appswitch" role="group" aria-label="Anwendung wählen">
+      <button id="sw-app" aria-pressed="true">Kunden-App</button>
+      <button id="sw-be" aria-pressed="false">Händler-Backend</button>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== KUNDEN-APP ===================== -->
+<div id="app-kunde">
+  <div class="stage">
+    <aside class="side">
+      <p class="claim">Ein Zettel. Alle Prospekte. Der günstigste Weg.</p>
+      <p class="lede">KorbKlug liest die Wochenprospekte aus, vergleicht den kompletten Einkauf über alle Märkte und rechnet ehrlich aus, ob sich ein zweiter Markt lohnt.</p>
+    </aside>
+
+    <div class="phone" aria-label="KorbKlug Kunden-App">
+      <div class="screen">
+        <div class="status num"><span>9:41</span><span>5G ▮▮▮</span></div>
+        <div class="appbar">
+          <div class="logo">Korb<span>Klug</span></div>
+          <button class="tachochip num" id="chip" data-go="tacho"></button>
+        </div>
+        <main class="content" id="view"></main>
+        <nav class="nav" id="nav"></nav>
+        <div class="toast" id="toast" role="status"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== HÄNDLER-BACKEND ===================== -->
+<div id="app-be" hidden>
+  <div class="be">
+    <aside class="be-side">
+      <div class="be-store"><span>KorbKlug für Händler</span><b>Tagwerk</b><span>Filiale Köln-Ehrenfeld · PLZ-Gebiet 50</span></div>
+      <nav class="be-nav" id="be-nav"></nav>
+      <p class="fine">Alle Nachfragedaten sind anonymisiert und zusammengefasst. Werte werden erst ab 50 Haushalten angezeigt.</p>
+    </aside>
+    <main class="be-main" id="be-view"></main>
+  </div>
+</div>
+<div class="be-toast" id="be-toast" role="status"></div>
+
+<script>
+/* =========================================================
+   GEMEINSAME DATEN (werden von beiden Anwendungen genutzt)
+   ========================================================= */
+const STORES={
+  F:{name:'Frischwerk',type:'Supermarkt',x:1.0,y:0.6,c:'#2F8F63'},
+  P:{name:'Preisheld',type:'Discounter',x:-0.8,y:1.6,c:'#E0A400'},
+  T:{name:'Tagwerk',type:'Supermarkt',x:2.6,y:2.2,c:'#C2410C'},
+  L:{name:'Lindenmarkt',type:'Discounter',x:0.4,y:-1.5,c:'#2563EB'}
+};
+const SK=Object.keys(STORES);
+const ME='T'; // Händler im Backend
+// p = Preis, a = günstigere Alternative (Eigenmarke), old = regulärer Preis bei Angebot, spon = gesponsert
+const CAT={
+  milch:{n:'Vollmilch 3,5 %',u:'1 l',d:52,p:{F:{p:1.19,a:.99},P:{p:.99},T:{p:1.09},L:{p:.99}}},
+  spaghetti:{n:'Spaghetti',u:'500 g',d:22,p:{F:{p:1.49,a:.79},P:{p:.79},T:{p:.99,old:1.59},L:{p:.85}}},
+  haehnchen:{n:'Hähnchenbrustfilet',u:'600 g',d:41,p:{F:{p:3.99,old:5.99},P:{p:6.29},T:{p:6.49},L:{p:6.49}}},
+  paprika:{n:'Paprika rot',u:'500 g',d:29,p:{F:{p:2.29},P:{p:1.79},T:{p:1.49,old:2.29},L:{p:1.49,old:1.99}}},
+  kaffee:{n:'Kaffee ganze Bohne',u:'500 g',d:33,p:{F:{p:4.99,old:7.99},P:{p:5.49},T:{p:7.49,a:5.29},L:{p:5.29}}},
+  butter:{n:'Deutsche Markenbutter',u:'250 g',d:38,p:{F:{p:2.39,a:2.19},P:{p:2.19},T:{p:1.79,old:2.39,spon:true},L:{p:2.19}}},
+  joghurt:{n:'Naturjoghurt 3,5 %',u:'500 g',d:18,p:{F:{p:.99,a:.65},P:{p:.65},T:{p:.89},L:{p:.69}}},
+  bananen:{n:'Bananen',u:'1 kg',d:24,p:{F:{p:1.89},P:{p:1.49},T:{p:1.69},L:{p:.99,old:1.49}}},
+  eier:{n:'Eier Freiland',u:'10 Stück',d:27,p:{F:{p:3.29,a:2.79},P:{p:2.79},T:{p:3.19},L:{p:2.89}}},
+  tomaten:{n:'Tomaten passiert',u:'500 g',d:15,p:{F:{p:1.29,a:.55},P:{p:.55},T:{p:.79},L:{p:.59}}},
+  gouda:{n:'Gouda gerieben',u:'200 g',d:14,p:{F:{p:2.49,a:1.69},P:{p:1.69},T:{p:1.99},L:{p:1.29,old:1.79}}},
+  klopapier:{n:'Toilettenpapier 3-lagig',u:'8 Rollen',d:12,p:{F:{p:4.99,a:3.45},P:{p:3.45},T:{p:3.99},L:{p:2.49,old:3.49}}},
+  reis:{n:'Basmati-Reis',u:'1 kg',d:11,p:{F:{p:3.49,a:1.99},P:{p:1.99},T:{p:2.49},L:{p:2.09}}},
+  zwiebeln:{n:'Zwiebeln',u:'1 kg',d:20,p:{F:{p:1.49},P:{p:.99},T:{p:1.29},L:{p:1.09}}},
+  mozzarella:{n:'Mozzarella',u:'125 g',d:9,p:{F:{p:1.29,a:.79},P:{p:.79},T:{p:.69,old:1.19},L:{p:.85}}},
+  haferflocken:{n:'Haferflocken zart',u:'500 g',d:8,p:{F:{p:1.19,a:.69},P:{p:.69},T:{p:.89},L:{p:.75}}},
+  wraps:{n:'Tortilla-Wraps',u:'6 Stück',d:6,p:{F:{p:2.29,a:1.29},P:{p:1.29},T:{p:1.79},L:{p:1.35}}},
+  hack:{n:'Hackfleisch gemischt',u:'500 g',d:17,p:{F:{p:4.49},P:{p:3.99},T:{p:2.99,old:4.29},L:{p:3.99}}},
+  apfelsaft:{n:'Apfelsaft naturtrüb',u:'1 l',d:7,p:{F:{p:1.79,a:1.19},P:{p:1.19},T:{p:1.49},L:{p:1.25}}}
+};
+// Regulärer Preis des Händlers (für Angebote im Backend)
+const REG={};Object.keys(CAT).forEach(id=>{const o=CAT[id].p[ME];REG[id]=o.old||o.p});
+const LISTS=48200; // aktive Listen im Einzugsgebiet pro Woche (Demo)
+
+const eur=v=>v.toLocaleString('de-DE',{style:'currency',currency:'EUR'});
+const km=v=>v.toLocaleString('de-DE',{maximumFractionDigits:1,minimumFractionDigits:1})+' km';
+const int=v=>Math.round(v).toLocaleString('de-DE');
+const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+const HOME={x:0,y:0};
+const best=(o)=>o.a!=null?Math.min(o.p,o.a):o.p; // bester Preis eines Markts für einen Artikel
+
+const I={
+  liste:'<path d="M8 6h12M8 12h12M8 18h12M4 6h.01M4 12h.01M4 18h.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>',
+  angebote:'<path d="M3 12V4h8l10 10-8 8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/><circle cx="7.5" cy="8.5" r="1.5" fill="currentColor"/>',
+  vorrat:'<rect x="5" y="2.5" width="14" height="19" rx="2.5" stroke="currentColor" stroke-width="2" fill="none"/><path d="M5 10h14M9 6v1.5M9 13v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  rezepte:'<path d="M6 13h12l-1 7H7zM8 13a4 4 0 1 1 1-7.9A4 4 0 0 1 16 6a3.5 3.5 0 0 1 0 7" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/>',
+  tacho:'<path d="M4 16a8 8 0 1 1 16 0M12 16l4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>',
+  plus:'<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>',
+  mic:'<rect x="9" y="3" width="6" height="11" rx="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>',
+  cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/><circle cx="12" cy="13" r="3.2" stroke="currentColor" stroke-width="2" fill="none"/>',
+  lockC:'<rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2" fill="none"/>',
+  lockO:'<rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M8 11V8a4 4 0 0 1 7.5-2" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>',
+  home:'<path d="M3 11l9-7 9 7v9H3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/>',
+  doc:'<path d="M6 3h9l4 4v14H6z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/><path d="M9 12h7M9 16h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+  mega:'<path d="M3 10v4h4l8 5V5L7 10z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/><path d="M18 9a4 4 0 0 1 0 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>',
+  chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>'
+};
+const svg=k=>`<svg viewBox="0 0 24 24" aria-hidden="true">${I[k]}</svg>`;
+
+/* ---------- Umschalten zwischen den Anwendungen ---------- */
+const APP={mode:'kunde'};
+function setMode(m){
+  APP.mode=m;
+  document.getElementById('app-kunde').hidden=m!=='kunde';
+  document.getElementById('app-be').hidden=m!=='be';
+  document.getElementById('sw-app').setAttribute('aria-pressed',m==='kunde');
+  document.getElementById('sw-be').setAttribute('aria-pressed',m==='be');
+  window.scrollTo(0,0);
+}
+
+/* =========================================================
+   KUNDEN-APP
+   ========================================================= */
+const START=['milch','spaghetti','haehnchen','paprika','kaffee','butter','joghurt','bananen','eier','tomaten','gouda','klopapier'];
+const MODES={auto:{l:'Auto',eur:.30,min:2},rad:{l:'Fahrrad',eur:0,min:4},fuss:{l:'Zu Fuß',eur:0,min:12}};
+const S={
+  view:'liste',
+  list:START.map(id=>({id,q:1,lock:false})),
+  alts:true,mode:'auto',storeFilter:'alle',
+  month:38.60,weeks:[8.20,11.40,9.70,9.30],year:312.40,km:14.6,rescued:1.2,
+  pantry:[
+    {n:'Mozzarella 125 g',d:2,max:14},{n:'Naturjoghurt 500 g',d:3,max:21},{n:'Paprika gelb 500 g',d:4,max:10},
+    {n:'Zwiebeln 1 kg',d:20,max:30},{n:'Basmati-Reis 1 kg',d:180,max:365},{n:'Haferflocken 500 g',d:120,max:365}
+  ],
+  done:false
+};
+
+function eff(entry,s,useAlts){
+  const o=CAT[entry.id].p[s];
+  let price=o.p,ai=false;
+  if(useAlts&&!entry.lock&&o.a!=null&&o.a<price){price=o.a;ai=true}
+  return {price:price*entry.q,ai,deal:!!o.old,old:o.old?o.old*entry.q:null,spon:!!o.spon,brand:o.p*entry.q};
+}
+function plan(stores,useAlts){
+  const m=MODES[S.mode];
+  const assign={};let goods=0,aiSave=0;
+  S.list.forEach(e=>{
+    let b=null;
+    stores.forEach(s=>{const r=eff(e,s,useAlts);if(!b||r.price<b.r.price-1e-9)b={s,r}});
+    (assign[b.s]=assign[b.s]||[]).push({e,r:b.r});
+    goods+=b.r.price;if(b.r.ai)aiSave+=b.r.brand-b.r.price;
+  });
+  const used=stores.filter(s=>assign[s]);
+  let d=0;
+  if(used.length===1)d=2*dist(HOME,STORES[used[0]]);
+  else if(used.length===2)d=dist(HOME,STORES[used[0]])+dist(STORES[used[0]],STORES[used[1]])+dist(STORES[used[1]],HOME);
+  const travel=d*m.eur;
+  return {stores:used,assign,goods,km:d,travel,net:goods+travel,min:Math.round(d*m.min),aiSave};
+}
+function analyse(){
+  const singles=SK.map(s=>plan([s],S.alts));
+  const pairs=[];
+  for(let i=0;i<SK.length;i++)for(let j=i+1;j<SK.length;j++){const p=plan([SK[i],SK[j]],S.alts);if(p.stores.length===2)pairs.push(p)}
+  singles.sort((a,b)=>a.net-b.net);pairs.sort((a,b)=>a.net-b.net);
+  const bs=singles[0],bp=pairs[0];
+  const gain=bp?bs.net-bp.net:0;
+  const extraMin=bp?bp.min-bs.min:0;
+  const goPair=bp&&gain>=1&&extraMin<=15;
+  const baseline=SK.map(s=>plan([s],false).goods).reduce((a,b)=>a+b,0)/SK.length;
+  return {singles,pairs,bs,bp,gain,extraMin,goPair,chosen:goPair?bp:bs,baseline};
+}
+const NAV=[['liste','Liste'],['angebote','Angebote'],['vorrat','Vorrat'],['rezepte','Rezepte'],['tacho','Tacho']];
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2600)}
+function renderNav(){
+  const active=S.view==='ergebnis'?'liste':S.view;
+  document.getElementById('nav').innerHTML=NAV.map(([k,l])=>`<button data-go="${k}" ${k===active?'aria-current="page"':''}>${svg(k)}<span>${l}</span></button>`).join('');
+  document.getElementById('chip').textContent=eur(S.month)+' im Nov.';
+}
+
+function vListe(){
+  const opts=Object.entries(CAT).filter(([id])=>!S.list.some(e=>e.id===id)).map(([,c])=>`<option value="${c.n}">`).join('');
+  return `
+  <div><h2 class="t">Einkaufsliste</h2><p class="sub">Wocheneinkauf · ${S.list.length} Artikel</p></div>
+  <form class="addbar" id="addform" autocomplete="off">
+    <input id="addinput" list="catlist" placeholder="z. B. Reis, Mozzarella, Wraps" aria-label="Artikel hinzufügen">
+    <datalist id="catlist">${opts}</datalist>
+    <button class="iconbtn" type="submit" aria-label="Hinzufügen">${svg('plus')}</button>
+    <button class="iconbtn" type="button" data-demo="Spracheingabe" aria-label="Spracheingabe">${svg('mic')}</button>
+    <button class="iconbtn" type="button" data-demo="Foto vom Zettel" aria-label="Foto vom Einkaufszettel">${svg('cam')}</button>
+  </form>
+  <div class="card"><ul class="items">${S.list.map((e,i)=>{const c=CAT[e.id];return `
+    <li><div class="grow"><div class="nm">${c.n}</div><div class="u">${c.u}${e.lock?' · Marke fixiert':''}</div></div>
+      <button class="lock" data-lock="${i}" aria-pressed="${e.lock}" aria-label="Marke fixieren" title="Marke fixieren: keine KI-Alternative">${svg(e.lock?'lockC':'lockO')}</button>
+      <div class="qty num"><button data-q="${i}" data-d="-1" aria-label="weniger">−</button><span>${e.q}</span><button data-q="${i}" data-d="1" aria-label="mehr">+</button></div>
+    </li>`}).join('')||'<li class="hint">Die Liste ist leer. Füge oben Artikel hinzu.</li>'}</ul></div>
+  <div class="card" style="display:flex;flex-direction:column;gap:12px">
+    <div class="switchrow"><div><b>KI-Alternativen</b><div class="hint">Eigenmarken mit gleichem Grundpreis-Nutzen vorschlagen</div></div>
+      <button class="switch" role="switch" id="altsw" aria-checked="${S.alts}" aria-label="KI-Alternativen"></button></div>
+    <div><div style="font-weight:700;margin-bottom:6px">Unterwegs mit</div>
+      <div class="seg">${Object.entries(MODES).map(([k,m])=>`<button data-mode="${k}" aria-pressed="${S.mode===k}">${m.l}</button>`).join('')}</div></div>
+  </div>
+  <button class="cta" data-go="ergebnis" ${S.list.length?'':'disabled'}>Günstigsten Einkauf finden</button>`;
+}
+
+function vErgebnis(){
+  if(!S.list.length)return vListe();
+  const A=analyse(),c=A.chosen,m=MODES[S.mode];
+  const names=c.stores.map(s=>STORES[s].name).join(' + ');
+  let reco;
+  if(A.goPair){
+    reco=`<div class="reco"><div class="eb">Empfehlung · 2 Märkte</div><div class="title">${names}</div>
+      <div class="big num">${eur(c.goods)}</div>
+      <div>${eur(A.bs.goods-c.goods)} günstiger als alles bei ${STORES[A.bs.stores[0]].name}. Nach Abzug des Umwegs bleiben <b>${eur(A.gain)}</b>.</div>
+      <div class="facts num"><span>${km(c.km)} Strecke</span><span>+${km(Math.max(c.km-A.bs.km,0))} Umweg</span><span>${m.eur?'+'+eur(Math.max(c.travel-A.bs.travel,0))+' Fahrtkosten':'keine Fahrtkosten'}</span><span>+${Math.max(A.extraMin,0)} Min.</span></div></div>`;
+  }else{
+    const how=S.mode==='fuss'?'zu Fuß':'mit dem '+m.l;
+    const why=!A.bp?'':(A.gain<1?`Ein zweiter Markt brächte nur ${eur(Math.max(A.gain,0))}.`:`Ein zweiter Markt spart zwar ${eur(A.gain)}, kostet ${how} aber ${A.extraMin} Minuten extra.`);
+    reco=`<div class="reco stay"><div class="eb">Empfehlung · 1 Markt</div><div class="title">Alles bei ${names}</div>
+      <div class="big num">${eur(c.goods)}</div>
+      <div>${why} Das lohnt sich nicht, bleib bei einem Markt.</div>
+      <div class="facts num"><span>${km(c.km)} Strecke</span><span>ca. ${c.min} Min. unterwegs</span></div></div>`;
+  }
+  const options=[...A.singles.slice(0,3),...A.pairs.slice(0,2)].sort((a,b)=>a.net-b.net).slice(0,4);
+  const optHtml=options.map(o=>`<div class="opt ${o===c?'best':''}">
+      <div class="o1">${o.stores.map(s=>STORES[s].name).join(' + ')}</div><div class="o3 num">${eur(o.goods)}</div>
+      <div class="o2 num">${km(o.km)} · ca. ${o.min} Min.</div><div class="o4 num">${m.eur?'inkl. Fahrt '+eur(o.net):''}</div></div>`).join('');
+  const lists=c.stores.map(s=>{const st=STORES[s];const rows=c.assign[s];const sum=rows.reduce((a,x)=>a+x.r.price,0);return `
+    <div class="card"><div class="storehead"><span class="dot" style="background:${st.c}"></span><b class="grow">${st.name}</b><span class="hint">${st.type} · ${km(dist(HOME,st))}</span></div>
+    <ul class="items">${rows.map(({e,r})=>{const cc=CAT[e.id];const disc=r.old?Math.round((1-r.price/r.old)*100):0;return `<li>
+      <div class="grow"><div class="nm">${e.q>1?e.q+' × ':''}${cc.n}${r.deal&&!r.ai?`<span class="badge b-deal">Angebot −${disc} %</span>`:''}${r.spon?'<span class="badge b-spon">Gesponsert</span>':''}${r.ai?'<span class="badge b-ai">KI: Eigenmarke</span>':''}</div>
+      <div class="u">${cc.u}${r.ai?' · spart '+eur(r.brand-r.price)+' ggü. Marke':''}</div></div>
+      <div class="price num">${r.old&&!r.ai?`<s>${eur(r.old)}</s>`:''}${eur(r.price)}</div></li>`}).join('')}</ul>
+    <div class="row" style="justify-content:space-between;margin-top:8px;font-weight:700"><span>Summe</span><span class="num">${eur(sum)}</span></div></div>`}).join('');
+  const save=Math.max(A.baseline-c.net,0);
+  return `
+  <div class="row"><button class="smallbtn" data-go="liste">← Liste</button><span class="grow"></span><span class="hint">${S.list.length} Artikel · ${m.l}</span></div>
+  ${reco}
+  <div><p class="eyebrow" style="margin-bottom:8px">Alle Optionen im Vergleich</p><div class="opts">${optHtml}</div></div>
+  ${S.alts&&c.aiSave>0?`<div class="card" style="background:var(--green-soft);border-color:transparent;color:var(--green-ink)"><b>KI-Alternativen sparen ${eur(c.aiSave)}</b><div style="font-size:13.5px">Gleiche Menge, günstigere Eigenmarke. Artikel mit fixierter Marke bleiben unverändert.</div></div>`:''}
+  <div><p class="eyebrow" style="margin-bottom:8px">Dein Einkaufszettel</p><div style="display:flex;flex-direction:column;gap:10px">${lists}</div></div>
+  <button class="cta" id="finish" ${S.done?'disabled':''}>${S.done?'Einkauf erledigt ✓':'Einkauf abschließen · '+eur(save)+' gespart'}</button>
+  <p class="demo-note">Ersparnis gegenüber dem Durchschnittspreis aller Märkte ohne Vergleich, inklusive Fahrtkosten</p>`;
+}
+
+function vAngebote(){
+  const offers=[];
+  Object.entries(CAT).forEach(([id,c])=>SK.forEach(s=>{const o=c.p[s];if(o.old)offers.push({id,s,c,o})}));
+  const pct=x=>1-x.o.p/x.o.old;
+  const f=offers.filter(x=>S.storeFilter==='alle'||x.s===S.storeFilter).sort((a,b)=>(b.o.spon?1:0)-(a.o.spon?1:0)||pct(b)-pct(a));
+  return `
+  <div><h2 class="t">Angebote der Woche</h2><p class="sub">${offers.length} Angebote aus 4 Prospekten · gültig Mo 9.11. bis Sa 14.11.</p></div>
+  <div class="chips"><button class="chip" data-sf="alle" aria-pressed="${S.storeFilter==='alle'}">Alle</button>${SK.map(s=>`<button class="chip" data-sf="${s}" aria-pressed="${S.storeFilter===s}">${STORES[s].name}</button>`).join('')}</div>
+  <div class="offers">${f.map(x=>{const on=S.list.some(e=>e.id===x.id);return `
+    <div class="offer"><div class="pic num">−${Math.round(pct(x)*100)} %</div>
+      <div class="on">${x.c.n}${x.o.spon?'<span class="badge b-spon">Gesponsert</span>':''}</div>
+      <div class="op num"><b>${eur(x.o.p)}</b><s>${eur(x.o.old)}</s></div>
+      <div class="st">${STORES[x.s].name} · ${x.c.u}</div>
+      <button data-addid="${x.id}" ${on?'disabled':''}>${on?'Auf der Liste':'+ Auf die Liste'}</button></div>`}).join('')||'<p class="hint">Keine Angebote für diesen Markt.</p>'}</div>
+  <p class="demo-note">Die Prospekt-KI liest Produkt, Menge, Preis und Gültigkeit aus und rechnet den Grundpreis aus.</p>`;
+}
+
+function vVorrat(){
+  const soon=S.pantry.filter(p=>p.d<=3);
+  return `
+  <div><h2 class="t">Vorrat</h2><p class="sub">${S.pantry.length} Produkte zu Hause</p></div>
+  ${soon.length?`<div class="alert">${soon.map(p=>p.n).join(' und ')} ${soon.length>1?'laufen':'läuft'} in den nächsten Tagen ab. Passende Rezepte stehen unter „Rezepte".</div>`:''}
+  <div class="card"><ul class="items">${S.pantry.slice().sort((a,b)=>a.d-b.d).map(p=>{const pc=Math.max(6,Math.min(100,p.d/p.max*100));const col=p.d<=3?'var(--warn)':p.d<=7?'var(--orange)':'var(--green)';return `
+    <li><div class="grow"><div class="nm">${p.n}</div><div class="u num">${p.d===1?'noch 1 Tag':'noch '+p.d+' Tage'}</div><div class="exp"><i style="width:${pc}%;background:${col}"></i></div></div></li>`}).join('')}</ul></div>
+  <button class="cta alt" id="scan">Kassenbon scannen</button>
+  <p class="demo-note">Nach dem Scan bucht die App die gekauften Produkte automatisch in den Vorrat.</p>`;
+}
+
+const RECIPES=[
+  {n:'Hähnchen-Paprika-Pfanne mit Reis',col:'#B8501A',por:4,pp:1.62,min:25,need:['haehnchen','paprika'],tags:[['a','Hähnchen im Angebot'],['a','Paprika im Angebot'],['v','Reis aus dem Vorrat'],['v','Zwiebeln aus dem Vorrat']]},
+  {n:'Spaghetti mit Tomaten und Mozzarella',col:'#1F7A4D',por:4,pp:.98,min:20,need:['spaghetti','tomaten'],tags:[['v','Mozzarella läuft in 2 Tagen ab'],['a','Spaghetti im Angebot'],['v','Zwiebeln aus dem Vorrat']]},
+  {n:'Overnight Oats mit Banane',col:'#A07808',por:2,pp:.74,min:5,need:['bananen','milch'],tags:[['v','Haferflocken aus dem Vorrat'],['v','Joghurt läuft in 3 Tagen ab'],['a','Bananen im Angebot']]}
+];
+function vRezepte(){
+  return `
+  <div><h2 class="t">Rezepte der Woche</h2><p class="sub">Aus aktuellen Angeboten und deinem Vorrat</p></div>
+  ${RECIPES.map((r,i)=>{const miss=r.need.filter(id=>!S.list.some(e=>e.id===id));return `
+    <div class="recipe"><div class="hero" style="background:linear-gradient(160deg,${r.col},${r.col}cc)">${r.n}</div>
+    <div class="bd"><div class="row num" style="gap:14px;font-size:13.5px"><b>${eur(r.pp)} pro Portion</b><span class="hint">${r.por} Portionen · ${r.min} Min.</span></div>
+      <div class="tags">${r.tags.map(([t,l])=>`<span class="tag ${t}">${l}</span>`).join('')}</div>
+      <button class="smallbtn" data-recipe="${i}" ${miss.length?'':'disabled'}>${miss.length?'Fehlende Zutaten auf die Liste ('+miss.length+')':'Alle Zutaten auf der Liste ✓'}</button></div></div>`}).join('')}`;
+}
+
+function vTacho(){
+  const goal=50,pc=Math.min(S.month/goal,1),R=90,len=Math.PI*R,mx=Math.max(...S.weeks,12);
+  return `
+  <div><h2 class="t">Spar-Tacho</h2><p class="sub">November 2026 · Ziel ${eur(goal)}</p></div>
+  <div class="card gauge">
+    <svg viewBox="0 0 220 130" role="img" aria-label="${eur(S.month)} von ${eur(goal)} gespart">
+      <path d="M20 115 A90 90 0 0 1 200 115" fill="none" stroke="var(--green-soft)" stroke-width="18" stroke-linecap="round"/>
+      <path d="M20 115 A90 90 0 0 1 200 115" fill="none" stroke="var(--green)" stroke-width="18" stroke-linecap="round" stroke-dasharray="${len*pc} ${len}"/>
+    </svg>
+    <div class="gv"><b class="num">${eur(S.month)}</b><span>${Math.round(pc*100)} % vom Monatsziel</span></div>
+  </div>
+  <div class="card"><p class="eyebrow" style="margin-bottom:10px">Gespart pro Woche</p>
+    <div class="weeks">${S.weeks.map((w,i)=>`<div class="wk"><b class="num">${eur(w)}</b><i style="height:${w/mx*80}%"></i><span>KW ${43+i}</span></div>`).join('')}</div></div>
+  <div class="stats">
+    <div class="stat"><b class="num">${eur(S.year)}</b><span>gespart in 2026</span></div>
+    <div class="stat"><b class="num">${km(S.km)}</b><span>Umwege vermieden, weil sie sich nicht lohnten</span></div>
+    <div class="stat"><b class="num">${S.rescued.toLocaleString('de-DE',{minimumFractionDigits:1})} kg</b><span>Lebensmittel vor dem Ablauf verbraucht</span></div>
+    <div class="stat"><b>Platz 12</b><span>von 340 in der Spar-Challenge Köln</span></div>
+  </div>
+  <div class="share"><b>„Ich habe dieses Jahr ${eur(S.year)} gespart."</b><span style="font-size:13.5px">Teile deine Kachel. Wer sich über deinen Link anmeldet, bekommt einen Monat Premium, du auch.</span><button id="sharebtn">Kachel teilen</button></div>`;
+}
+
+function render(){
+  const map={liste:vListe,ergebnis:vErgebnis,angebote:vAngebote,vorrat:vVorrat,rezepte:vRezepte,tacho:vTacho};
+  document.getElementById('view').innerHTML=(map[S.view]||vListe)();
+  renderNav();
+}
+function go(where){
+  if(where==='ergebnis-fuss'){S.mode='fuss';where='ergebnis'}
+  else if(where==='ergebnis'&&S.view!=='liste'&&S.view!=='ergebnis'){S.mode='auto'}
+  setMode('kunde');
+  S.view=where;render();document.getElementById('view').scrollTop=0;
+}
+function addItem(id){
+  if(S.list.some(e=>e.id===id)){toast(CAT[id].n+' steht schon auf der Liste.');return false}
+  S.list.push({id,q:1,lock:false});S.done=false;return true;
+}
+
+/* =========================================================
+   HÄNDLER-BACKEND (Tagwerk)
+   ========================================================= */
+const B={
+  view:'uebersicht',
+  simItem:'kaffee',simPrice:null,
+  upload:0, // 0 = noch nicht, 1..4 = läuft, 5 = fertig
+  newIds:[],
+  campaigns:[{id:'butter',budget:250,impr:8600,clicks:1870,red:412,active:true,start:'02.11.'}]
+};
+const BE_NAV=[['uebersicht','Übersicht','home'],['angebote','Angebote & Prospekt','doc'],['kampagnen','Kampagnen','mega'],['nachfrage','Nachfrage & Preise','chart']];
+const DAYS=[['Mo',.62],['Di',.48],['Mi',.55],['Do',.71],['Fr',1],['Sa',.93]];
+
+function compete(id,myPrice){
+  // Rang des Händlers bei einem Artikel (alle Märkte mit bestem Preis inkl. Eigenmarke)
+  const rows=SK.map(s=>({s,price:s===ME&&myPrice!=null?myPrice:best(CAT[id].p[s])}));
+  rows.sort((a,b)=>a.price-b.price||(a.s===ME?-1:b.s===ME?1:0));
+  const rank=rows.findIndex(r=>r.s===ME)+1;
+  const others=rows.filter(r=>r.s!==ME);
+  const minOther=Math.min(...others.map(r=>r.price));
+  return {rows,rank,minOther,me:rows.find(r=>r.s===ME).price};
+}
+function winLists(id,myPrice){
+  const c=compete(id,myPrice);
+  return c.me<=c.minOther+1e-9?CAT[id].d/100*LISTS:0;
+}
+function totalWins(){return Object.keys(CAT).reduce((a,id)=>a+winLists(id),0)}
+function chances(){
+  return Object.keys(CAT).map(id=>{const c=compete(id);return {id,gap:c.me-c.minOther,lists:CAT[id].d/100*LISTS,minOther:c.minOther,me:c.me}})
+    .filter(x=>x.gap>0&&CAT[x.id].d>=15).sort((a,b)=>b.lists/(b.gap+.2)-a.lists/(a.gap+.2)).slice(0,4);
+}
+function setMyPrice(id,price){
+  const o=CAT[id].p[ME];const reg=REG[id];
+  price=Math.round(price*100)/100;
+  o.p=price;
+  if(price<reg-0.004){o.old=reg}else{delete o.old;delete o.spon;const cp=B.campaigns.find(x=>x.id===id);if(cp)cp.active=false}
+  if(o.a!=null&&o.a>=o.p)delete o.a;
+  S.done=false;
+}
+function beToast(t){const el=document.getElementById('be-toast');el.textContent=t;el.classList.add('show');clearTimeout(beToast.t);beToast.t=setTimeout(()=>el.classList.remove('show'),3200)}
+
+function beUebersicht(){
+  const wins=totalWins();
+  const offersN=Object.keys(CAT).filter(id=>CAT[id].p[ME].old).length;
+  const act=B.campaigns.filter(c=>c.active);
+  const red=B.campaigns.reduce((a,c)=>a+c.red,0);
+  const top=Object.entries(CAT).sort((a,b)=>b[1].d-a[1].d).slice(0,7);
+  return `
+  <div class="be-head"><div><h1>Übersicht</h1><p>Kalenderwoche 46 · 9. bis 14. November 2026</p></div>
+    <button class="btn" data-go="angebote">In der Kunden-App ansehen</button></div>
+  <div class="kpis num">
+    <div class="kpi"><div class="v">${int(LISTS)}</div><div class="l">aktive Einkaufslisten im Einzugsgebiet</div><div class="d up">+6 % ggü. Vorwoche</div></div>
+    <div class="kpi"><div class="v">${int(wins)}</div><div class="l">Artikel auf Listen, bei denen Tagwerk am günstigsten ist</div><div class="d up">KorbKlug empfiehlt Ihren Markt</div></div>
+    <div class="kpi"><div class="v">${offersN}</div><div class="l">aktive Angebote im Prospekt</div><div class="d">${act.length} davon gesponsert</div></div>
+    <div class="kpi"><div class="v">${int(red)}</div><div class="l">Einlösungen über Kampagnen</div><div class="d">Kosten ${eur(red*0.25)}</div></div>
+  </div>
+  <div class="grid2">
+    <div class="box"><h3>Chancen diese Woche</h3>
+      <p class="fine" style="margin-bottom:6px">Häufig gesuchte Artikel, bei denen ein anderer Markt günstiger ist</p>
+      ${chances().map(x=>`<div class="chance"><div class="cn">${CAT[x.id].n} <span class="hint">${CAT[x.id].u}</span></div>
+        <div class="cd num">Auf ${int(x.lists)} Listen · Ihr Preis ${eur(x.me)}, günstigster Wettbewerber ${eur(x.minOther)} · Abstand ${eur(x.gap)}</div>
+        <button class="btn" data-sim="${x.id}">Preis simulieren</button></div>`).join('')||'<p class="hint">Sie sind bei allen gefragten Artikeln am günstigsten.</p>'}
+    </div>
+    <div class="box"><h3>Am häufigsten auf den Listen</h3>
+      ${top.map(([id,c])=>`<div class="hbar"><span>${c.n}</span><span class="track"><span class="fill" style="width:${c.d/55*100}%"></span></span><span class="val num">${c.d} %</span></div>`).join('')}
+      <p class="fine">Anteil der Listen im PLZ-Gebiet 50</p>
+    </div>
+  </div>
+  <div class="box"><h3>Wann Ihre Kunden einkaufen wollen</h3>
+    <div class="days">${DAYS.map(([d,v])=>`<div class="day"><b class="num">${int(v*9800)}</b><i style="height:${v*100}%"></i><span>${d}</span></div>`).join('')}</div>
+    <p class="fine" style="margin-top:8px">Geplante Einkäufe pro Tag aus den Listen. Freitag und Samstag sind die stärksten Tage, ein Angebot ab Donnerstag erreicht die meisten Haushalte.</p>
+  </div>`;
+}
+
+function beAngebote(){
+  const ids=Object.keys(CAT).sort((a,b)=>(CAT[b].p[ME].old?1:0)-(CAT[a].p[ME].old?1:0)||CAT[b].d-CAT[a].d);
+  const steps=['Prospekt-PDF wird gelesen (16 Seiten)','184 Produkte erkannt','Mengen und Grundpreise berechnet','3 neue Angebote für KW 47 übernommen'];
+  return `
+  <div class="be-head"><div><h1>Angebote &amp; Prospekt</h1><p>Preise ändern sich sofort in der Kunden-App</p></div></div>
+  <div class="box"><h3>Prospekt hochladen</h3>
+    <div class="upload">
+      <div class="drop"><b>Prospekt KW 47 · tagwerk_koeln_kw47.pdf</b><span class="hint">Die Prospekt-KI erkennt Produkte, Mengen, Preise und Gültigkeit und legt die Angebote automatisch an.</span></div>
+      ${B.upload===0?'<button class="btn primary" id="upload">Prospekt auslesen</button>':''}
+      ${B.upload>0?`<div class="progress">${steps.map((t,i)=>`<div class="${B.upload>i+1||B.upload===5?'ok':''}"><i>${B.upload>i+1||B.upload===5?'✓':''}</i><span>${t}</span></div>`).join('')}</div>`:''}
+    </div>
+  </div>
+  <div class="tablewrap"><table class="be-t num">
+    <thead><tr><th>Produkt</th><th class="r">Nachfrage</th><th class="r">Normalpreis</th><th class="r">Ihr Preis</th><th>Status</th><th class="r">Günstigster Wettbewerber</th><th class="r">Ihr Rang</th></tr></thead>
+    <tbody>${ids.map(id=>{const c=CAT[id],o=c.p[ME],cm=compete(id);const other=cm.rows.find(r=>r.s!==ME&&Math.abs(r.price-cm.minOther)<1e-9);return `<tr>
+      <td><b>${c.n}</b><div class="hint">${c.u}</div></td>
+      <td class="r">${c.d} %</td>
+      <td class="r">${eur(REG[id])}</td>
+      <td class="r"><input type="number" step="0.01" min="0.1" value="${o.p.toFixed(2)}" data-price="${id}" aria-label="Preis ${c.n}">${o.a!=null&&o.a<o.p?`<div class="hint">Eigenmarke ${eur(o.a)}</div>`:''}</td>
+      <td>${o.old?'<span class="pill on">Angebot −'+Math.round((1-o.p/o.old)*100)+' %</span>':'<span class="pill reg">regulär</span>'} ${B.newIds.includes(id)?'<span class="pill ai">von KI erkannt</span>':''} ${o.spon?'<span class="pill spon">gesponsert</span>':''}</td>
+      <td class="r">${eur(cm.minOther)} <span class="hint">${STORES[other.s].name}</span></td>
+      <td class="r"><span class="rank ${cm.rank===1?'r1':''}">${cm.rank}</span></td></tr>`}).join('')}</tbody>
+  </table></div>
+  <p class="fine">Rang 1 bedeutet: KorbKlug empfiehlt Tagwerk für diesen Artikel. Verglichen wird mit dem günstigsten gleichwertigen Produkt, also auch mit Eigenmarken.</p>`;
+}
+
+function beKampagnen(){
+  const offerIds=Object.keys(CAT).filter(id=>CAT[id].p[ME].old&&!B.campaigns.some(c=>c.id===id));
+  return `
+  <div class="be-head"><div><h1>Kampagnen</h1><p>Gesponserte Angebote erscheinen oben in der Kunden-App, immer mit der Kennzeichnung „Gesponsert"</p></div></div>
+  <div class="callout">Bezahlt wird nur pro Einlösung (0,25 €). Eine Kampagne ändert nie das Ergebnis „günstigster Einkauf". Sie macht ein echtes Angebot nur sichtbarer.</div>
+  <div class="tablewrap"><table class="be-t num">
+    <thead><tr><th>Angebot</th><th>Status</th><th class="r">Einblendungen</th><th class="r">Klicks</th><th class="r">Einlösungen</th><th class="r">Quote</th><th class="r">Kosten / Budget</th><th></th></tr></thead>
+    <tbody>${B.campaigns.map((c,i)=>{const o=CAT[c.id].p[ME];return `<tr>
+      <td><b>${CAT[c.id].n} für ${eur(o.p)}</b><div class="hint">seit ${c.start}</div></td>
+      <td>${c.active?'<span class="pill spon">läuft</span>':'<span class="pill pause">pausiert</span>'}</td>
+      <td class="r">${int(c.impr)}</td><td class="r">${int(c.clicks)}</td><td class="r">${int(c.red)}</td>
+      <td class="r">${c.clicks?Math.round(c.red/c.clicks*100)+' %':'–'}</td>
+      <td class="r">${eur(c.red*.25)} / ${eur(c.budget)}</td>
+      <td class="r"><button class="btn ghost" data-camp="${i}" ${!o.old?'disabled title="Kein aktives Angebot"':''}>${c.active?'Pausieren':'Fortsetzen'}</button></td></tr>`}).join('')}</tbody>
+  </table></div>
+  <div class="box"><h3>Neue Kampagne</h3>
+    ${offerIds.length?`<form class="form" id="campform">
+      <label>Angebot<select id="c-item">${offerIds.map(id=>`<option value="${id}">${CAT[id].n} · ${eur(CAT[id].p[ME].p)}</option>`).join('')}</select></label>
+      <label>Budget<input id="c-budget" type="number" min="25" step="25" value="150"></label>
+      <label>Laufzeit<select id="c-run"><option>bis Samstag</option><option>2 Wochen</option></select></label>
+      <button class="btn primary" type="submit">Kampagne starten</button></form>
+      <p class="fine" style="margin-top:8px">Geschätzte Reichweite: ca. ${int(LISTS*.18)} Einblendungen pro Woche</p>`
+    :'<p class="hint">Alle aktiven Angebote laufen bereits als Kampagne. Legen Sie unter „Angebote &amp; Prospekt" ein neues Angebot an.</p>'}
+  </div>`;
+}
+
+function beNachfrage(){
+  const id=B.simItem,c=CAT[id],reg=REG[id];
+  const cur=best(c.p[ME]);
+  const price=B.simPrice??cur;
+  const cm=compete(id,price);
+  const wins=winLists(id,price);
+  const needed=cm.minOther-0.01;
+  const maxP=Math.max(reg*1.1,cur),minP=Math.max(reg*.4,0.1);
+  return `
+  <div class="be-head"><div><h1>Nachfrage &amp; Preise</h1><p>Preis-Simulator: Ab welchem Preis empfiehlt KorbKlug Ihren Markt?</p></div></div>
+  <div class="sim">
+    <div class="box">
+      <h3>Artikel und Preis</h3>
+      <label class="hint" for="s-item">Artikel</label>
+      <select id="s-item" style="width:100%;margin:4px 0 14px;border:1px solid var(--line);background:var(--screen);border-radius:10px;padding:9px 10px;font:inherit;color:var(--ink)">
+        ${Object.entries(CAT).sort((a,b)=>b[1].d-a[1].d).map(([k,v])=>`<option value="${k}" ${k===id?'selected':''}>${v.n} · auf ${v.d} % der Listen</option>`).join('')}
+      </select>
+      <div class="row" style="justify-content:space-between"><span class="hint">Ihr Preis</span><span class="simbig num" id="s-out">${eur(price)}</span></div>
+      <input type="range" id="s-range" min="${minP.toFixed(2)}" max="${maxP.toFixed(2)}" step="0.01" value="${price.toFixed(2)}" aria-label="Preis">
+      <div class="row hint num" style="justify-content:space-between"><span>${eur(minP)}</span><span>Normalpreis ${eur(reg)}</span><span>${eur(maxP)}</span></div>
+      <div class="row" style="margin-top:14px;gap:8px;flex-wrap:wrap">
+        <button class="btn" id="s-match" ${needed<minP?'disabled':''}>Günstigsten Preis setzen (${eur(Math.max(needed,minP))})</button>
+        <button class="btn primary" id="s-apply" ${Math.abs(price-cur)<0.005?'disabled':''}>Als Preis übernehmen</button>
+      </div>
+    </div>
+    <div class="box simout">
+      <h3>Wirkung in KorbKlug</h3>
+      <div class="simrow"><span>Ihr Rang bei ${c.n}</span><b><span class="rank ${cm.rank===1?'r1':''}">${cm.rank}</span></b></div>
+      <div class="simrow"><span>Listen, auf denen Tagwerk empfohlen wird</span><b class="num">${int(wins)}</b></div>
+      <div class="simrow"><span>Rabatt ggü. Normalpreis</span><b class="num">${price<reg?Math.round((1-price/reg)*100)+' %':'kein Angebot'}</b></div>
+      <div><p class="eyebrow" style="margin:6px 0 8px">Preise im Umkreis</p>
+        <div class="comp num">${cm.rows.map(r=>`<div class="${r.s===ME?'me':''}"><span class="dot" style="background:${STORES[r.s].c}"></span><span>${STORES[r.s].name}${r.s===ME?' (Sie)':''}</span><span>${eur(r.price)}</span></div>`).join('')}</div></div>
+      <p class="fine">Wettbewerbspreise stammen aus den öffentlichen Prospekten der Woche, inklusive gleichwertiger Eigenmarken.</p>
+    </div>
+  </div>`;
+}
+
+function renderBE(){
+  document.getElementById('be-nav').innerHTML=BE_NAV.map(([k,l,ic])=>`<button data-be="${k}" ${k===B.view?'aria-current="page"':''}>${svg(ic)}<span>${l}</span></button>`).join('');
+  const map={uebersicht:beUebersicht,angebote:beAngebote,kampagnen:beKampagnen,nachfrage:beNachfrage};
+  document.getElementById('be-view').innerHTML=map[B.view]();
+}
+function goBE(v){B.view=v;setMode('be');renderBE()}
+
+/* ---------- Ereignisse ---------- */
+document.addEventListener('click',ev=>{
+  const b=ev.target.closest('button');if(!b)return;
+  if(b.id==='sw-app'){go(S.view==='ergebnis'?'ergebnis':S.view);return}
+  if(b.id==='sw-be'){goBE(B.view);return}
+  if(b.dataset.go){go(b.dataset.go);return}
+  if(b.dataset.be){goBE(b.dataset.be);return}
+  // Kunden-App
+  if(b.dataset.demo)return toast(b.dataset.demo+' kommt bald.');
+  if(b.dataset.lock!=null){const e=S.list[+b.dataset.lock];e.lock=!e.lock;S.done=false;render();toast(e.lock?CAT[e.id].n+': Marke fixiert, keine Alternative.':CAT[e.id].n+': KI darf Alternativen vorschlagen.');return}
+  if(b.dataset.q!=null){const i=+b.dataset.q,e=S.list[i];e.q+=+b.dataset.d;if(e.q<1)S.list.splice(i,1);S.done=false;render();return}
+  if(b.id==='altsw'){S.alts=!S.alts;S.done=false;render();return}
+  if(b.dataset.mode){S.mode=b.dataset.mode;S.done=false;render();return}
+  if(b.dataset.sf){S.storeFilter=b.dataset.sf;render();return}
+  if(b.dataset.addid){if(addItem(b.dataset.addid)){render();toast(CAT[b.dataset.addid].n+' steht jetzt auf der Liste.')}return}
+  if(b.dataset.recipe!=null){const r=RECIPES[+b.dataset.recipe];let n=0;r.need.forEach(id=>{if(!S.list.some(e=>e.id===id)){S.list.push({id,q:1,lock:false});n++}});S.done=false;render();toast(n+(n===1?' Zutat':' Zutaten')+' hinzugefügt.');return}
+  if(b.id==='finish'){
+    const A=analyse(),save=Math.max(A.baseline-A.chosen.net,0);
+    S.month+=save;S.year+=save;S.weeks[3]+=save;S.done=true;
+    if(!A.goPair&&A.bp)S.km+=Math.max(A.bp.km-A.bs.km,0);
+    render();toast(eur(save)+' zum Spar-Tacho hinzugefügt.');return}
+  if(b.id==='scan'){
+    const add=[{n:'Hähnchenbrustfilet 600 g',d:3,max:6},{n:'Bananen 1 kg',d:6,max:8}].filter(x=>!S.pantry.some(p=>p.n===x.n));
+    S.pantry.push(...add);render();toast(add.length?'Bon erkannt: '+add.length+' Produkte in den Vorrat gebucht.':'Dieser Bon wurde schon gebucht.');return}
+  if(b.id==='sharebtn')return toast('Deine Kachel ist bereit zum Teilen.');
+  // Backend
+  if(b.dataset.sim){B.simItem=b.dataset.sim;B.simPrice=null;goBE('nachfrage');return}
+  if(b.id==='upload'){
+    B.upload=1;renderBE();
+    const tick=()=>{B.upload++;if(B.upload===5){
+        [['kaffee',4.49],['eier',2.59],['joghurt',.59]].forEach(([id,p])=>{setMyPrice(id,p);if(!B.newIds.includes(id))B.newIds.push(id)});
+        beToast('3 neue Angebote übernommen. Sie sind ab sofort in der Kunden-App sichtbar.');
+      }
+      if(B.view==='angebote')renderBE();
+      if(B.upload<5)setTimeout(tick,650)};
+    setTimeout(tick,650);return}
+  if(b.dataset.camp!=null){
+    const c=B.campaigns[+b.dataset.camp];c.active=!c.active;
+    const o=CAT[c.id].p[ME];if(c.active)o.spon=true;else delete o.spon;
+    renderBE();beToast(c.active?'Kampagne läuft wieder.':'Kampagne pausiert. Das Angebot bleibt sichtbar, aber ohne Hervorhebung.');return}
+  if(b.id==='s-match'){const cm=compete(B.simItem);B.simPrice=Math.max(Math.round((cm.minOther-0.01)*100)/100,0.1);renderBE();return}
+  if(b.id==='s-apply'){
+    const id=B.simItem,p=B.simPrice??CAT[id].p[ME].p;setMyPrice(id,p);B.simPrice=null;renderBE();
+    beToast(CAT[id].n+' kostet jetzt '+eur(p)+'. Die Kunden-App rechnet ab sofort mit dem neuen Preis.');return}
+});
+document.addEventListener('change',ev=>{
+  const t=ev.target;
+  if(t.dataset&&t.dataset.price){
+    const v=parseFloat(String(t.value).replace(',','.'));
+    if(!(v>0)){beToast('Bitte einen Preis über 0 € eingeben.');renderBE();return}
+    setMyPrice(t.dataset.price,v);renderBE();beToast(CAT[t.dataset.price].n+': neuer Preis '+eur(v)+' ist live.');return}
+  if(t.id==='s-item'){B.simItem=t.value;B.simPrice=null;renderBE();return}
+});
+document.addEventListener('input',ev=>{
+  const t=ev.target;
+  if(t.id==='s-range'){B.simPrice=parseFloat(t.value);
+    // nur Ausgabe aktualisieren, damit der Regler beim Ziehen nicht neu gerendert wird
+    document.getElementById('s-out').textContent=eur(B.simPrice);
+    clearTimeout(beNachfrage.t);beNachfrage.t=setTimeout(()=>{const y=window.scrollY;renderBE();window.scrollTo(0,y);document.getElementById('s-range')?.focus()},120)}
+});
+document.addEventListener('submit',ev=>{
+  ev.preventDefault();
+  if(ev.target.id==='addform'){
+    const v=document.getElementById('addinput').value.trim().toLowerCase();if(!v)return;
+    const hit=Object.entries(CAT).find(([id,c])=>c.n.toLowerCase().includes(v)||id.includes(v));
+    if(!hit){toast('Nicht gefunden. Probier Reis, Mozzarella, Wraps oder Hackfleisch.');return}
+    if(addItem(hit[0])){render();toast(hit[1].n+' hinzugefügt.');document.getElementById('addinput')?.focus()}
+    return}
+  if(ev.target.id==='campform'){
+    const id=document.getElementById('c-item').value,budget=parseFloat(document.getElementById('c-budget').value)||150;
+    B.campaigns.push({id,budget,impr:0,clicks:0,red:0,active:true,start:'09.11.'});
+    CAT[id].p[ME].spon=true;renderBE();
+    beToast('Kampagne für '+CAT[id].n+' gestartet. In der Kunden-App steht das Angebot jetzt oben.');return}
+});
+
+/* ---------- Direktlinks ---------- */
+function fromHash(){
+  const h=(location.hash||'').slice(1);
+  if(h==='haendler'||h==='backend'){render();goBE('uebersicht');return}
+  if(h.startsWith('backend-')){const v=h.slice(8);render();if(BE_NAV.some(x=>x[0]===v)){goBE(v)}else goBE('uebersicht');return}
+  if(['liste','ergebnis','ergebnis-fuss','angebote','vorrat','rezepte','tacho'].includes(h))go(h);else render();
+}
+window.addEventListener('hashchange',fromHash);
+try{if(new URLSearchParams(location.search).has('shot'))document.body.classList.add('shot')}catch(e){}
+fromHash();
+</script>
