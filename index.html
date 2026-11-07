@@ -1,4 +1,4 @@
-<title>KorbKlug</title>
+<title>Savr Cart</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -55,6 +55,14 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .side{min-width:0;display:flex;flex-direction:column;gap:22px;padding-top:8px}
 .claim{font-family:var(--display);font-weight:800;font-size:34px;line-height:1.1;margin:0;max-width:16ch;text-wrap:balance;letter-spacing:-.02em}
 .lede{color:var(--muted);margin:0;max-width:60ch}
+.stores{display:flex;flex-direction:column;gap:8px}
+.storebadges{display:flex;flex-wrap:wrap;gap:10px}
+.storebadge{display:inline-flex;align-items:center;gap:10px;background:#000;color:#fff;border:1px solid #A6A6A6;border-radius:10px;padding:7px 16px 7px 12px;min-height:48px;text-align:left;cursor:pointer;transition:transform .15s}
+.storebadge:hover{transform:translateY(-1px)}
+.storebadge svg{width:26px;height:26px;flex:none}
+.storebadge span{display:flex;flex-direction:column;line-height:1.1}
+.storebadge small{font-size:11px;letter-spacing:.02em}
+.storebadge b{font-size:18px;font-weight:600;letter-spacing:-.01em}
 .steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 .steps button{width:100%;text-align:left;display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start;
   background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
@@ -159,6 +167,11 @@ h2.t{font-family:var(--display);font-weight:800;font-size:24px;margin:2px 0 0;le
 .tag.v{background:var(--green-soft);color:var(--green-ink);border-color:transparent}
 .tag.a{background:var(--orange-soft);color:var(--orange-ink);border-color:transparent}
 .smallbtn{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 10px;font-weight:700;font-size:13px}
+.sugg{display:flex;flex-direction:column;gap:6px}
+.iconbtn.sm{width:36px;height:36px;border-radius:10px;color:var(--green)}
+.xbtn{border:0;background:none;color:var(--muted);font-size:20px;line-height:1;width:28px;height:36px;flex:none;border-radius:8px}
+.donecard{display:flex;align-items:center;gap:10px;background:var(--green-soft);border-color:transparent;color:var(--green-ink);font-size:13.5px}
+.donecard b{font-size:15px}
 .gauge{display:grid;place-items:center;position:relative}
 .gauge svg{width:220px;height:130px}
 .gauge .gv{position:absolute;bottom:4px;text-align:center}
@@ -332,7 +345,7 @@ body.shot .toast{display:none}
 
 <header class="topbar">
   <div class="topbar-in">
-    <div class="wordmark">Korb<span>Klug</span></div>
+    <div class="wordmark">Savr<span>Cart</span></div>
     <div class="appswitch" role="group" aria-label="Anwendung wählen">
       <button id="sw-app" aria-pressed="true">Kunden-App</button>
       <button id="sw-be" aria-pressed="false">Händler-Backend</button>
@@ -344,15 +357,28 @@ body.shot .toast{display:none}
 <div id="app-kunde">
   <div class="stage">
     <aside class="side">
-      <p class="claim">Ein Zettel. Alle Prospekte. Der günstigste Weg.</p>
-      <p class="lede">KorbKlug liest die Wochenprospekte aus, vergleicht den kompletten Einkauf über alle Märkte und rechnet ehrlich aus, ob sich ein zweiter Markt lohnt.</p>
+      <p class="claim">Du schreibst die Liste. Savr Cart findet den günstigsten Weg.</p>
+      <p class="lede">Savr Cart liest die Wochenprospekte aus, vergleicht den kompletten Einkauf über alle Märkte und rechnet ehrlich aus, ob sich ein zweiter Markt lohnt.</p>
+      <div class="stores">
+        <div class="storebadges">
+          <button class="storebadge" type="button" data-demo="Savr Cart im App Store" aria-label="Laden im App Store (iOS)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.4 12.6c0-2.4 2-3.6 2.1-3.7-1.1-1.7-2.9-1.9-3.5-1.9-1.5-.2-2.9.9-3.7.9-.8 0-1.9-.9-3.2-.8-1.6 0-3.1 1-4 2.4-1.7 3-.4 7.3 1.2 9.7.8 1.2 1.8 2.5 3 2.4 1.2 0 1.7-.8 3.1-.8 1.5 0 1.9.8 3.2.8 1.3 0 2.1-1.2 2.9-2.4.9-1.4 1.3-2.7 1.3-2.8 0 0-2.4-1-2.4-3.8zM14 5.5c.7-.8 1.1-1.9 1-3-1 0-2.1.7-2.8 1.5-.6.7-1.2 1.8-1 2.9 1.1.1 2.1-.6 2.8-1.4z"/></svg>
+            <span><small>Laden im</small><b>App Store</b></span>
+          </button>
+          <button class="storebadge" type="button" data-demo="Savr Cart bei Google Play" aria-label="Jetzt bei Google Play (Android)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#00A0FF" d="M3.6 2.3c-.3.3-.5.7-.5 1.2v17c0 .5.2.9.5 1.2L13.3 12z"/><path fill="#00F076" d="M16.6 8.7 5.1 2.1c-.5-.3-1-.3-1.5.2L13.3 12z"/><path fill="#FF3A44" d="M3.6 21.7c.5.5 1 .5 1.5.2l11.5-6.6L13.3 12z"/><path fill="#FFD400" d="m20.3 10.8-3.7-2.1-3.3 3.3 3.3 3.3 3.7-2.1c1-.6 1-1.8 0-2.4z"/></svg>
+            <span><small>Jetzt bei</small><b>Google Play</b></span>
+          </button>
+        </div>
+        <p class="hint">Komplett kostenlos, ohne Abo und ohne In-App-Käufe · für iPhone (ab iOS 16) und Android (ab Version 10)</p>
+      </div>
     </aside>
 
-    <div class="phone" aria-label="KorbKlug Kunden-App">
+    <div class="phone" aria-label="Savr Cart Kunden-App">
       <div class="screen">
         <div class="status num"><span>9:41</span><span>5G ▮▮▮</span></div>
         <div class="appbar">
-          <div class="logo">Korb<span>Klug</span></div>
+          <div class="logo">Savr<span>Cart</span></div>
           <button class="tachochip num" id="chip" data-go="tacho"></button>
         </div>
         <main class="content" id="view"></main>
@@ -367,7 +393,7 @@ body.shot .toast{display:none}
 <div id="app-be" hidden>
   <div class="be">
     <aside class="be-side">
-      <div class="be-store"><span>KorbKlug für Händler</span><b>Tagwerk</b><span>Filiale Köln-Ehrenfeld · PLZ-Gebiet 50</span></div>
+      <div class="be-store"><span>Savr Cart für Händler</span><b>Tagwerk</b><span>Filiale Köln-Ehrenfeld · PLZ-Gebiet 50</span></div>
       <nav class="be-nav" id="be-nav"></nav>
       <p class="fine">Alle Nachfragedaten sind anonymisiert und zusammengefasst. Werte werden erst ab 50 Haushalten angezeigt.</p>
     </aside>
@@ -408,8 +434,61 @@ const CAT={
   haferflocken:{n:'Haferflocken zart',u:'500 g',d:8,p:{F:{p:1.19,a:.69},P:{p:.69},T:{p:.89},L:{p:.75}}},
   wraps:{n:'Tortilla-Wraps',u:'6 Stück',d:6,p:{F:{p:2.29,a:1.29},P:{p:1.29},T:{p:1.79},L:{p:1.35}}},
   hack:{n:'Hackfleisch gemischt',u:'500 g',d:17,p:{F:{p:4.49},P:{p:3.99},T:{p:2.99,old:4.29},L:{p:3.99}}},
-  apfelsaft:{n:'Apfelsaft naturtrüb',u:'1 l',d:7,p:{F:{p:1.79,a:1.19},P:{p:1.19},T:{p:1.49},L:{p:1.25}}}
+  apfelsaft:{n:'Apfelsaft naturtrüb',u:'1 l',d:7,p:{F:{p:1.79,a:1.19},P:{p:1.19},T:{p:1.49},L:{p:1.25}}},
+  // Erweitertes Sortiment
+  // Milchprodukte und Alternativen
+  quark:{n:'Magerquark',u:'500 g',d:13,p:{F:{p:1.29,a:.79},P:{p:.79},T:{p:.99},L:{p:.69,old:.99}}},
+  sahne:{n:'Schlagsahne 30 %',u:'200 g',d:10,p:{F:{p:.99,a:.69},P:{p:.69},T:{p:.89},L:{p:.69}}},
+  frischkaese:{n:'Frischkäse natur',u:'200 g',d:9,p:{F:{p:1.49,a:.99},P:{p:.99},T:{p:1.29},L:{p:1.05}}},
+  hafermilch:{n:'Haferdrink',u:'1 l',d:10,p:{F:{p:1.99,a:.99},P:{p:.99},T:{p:1.49},L:{p:1.09}}},
+  // Brot und Backwaren
+  toast:{n:'Buttertoast',u:'500 g',d:16,p:{F:{p:1.49,a:.99},P:{p:.99},T:{p:1.19},L:{p:.89,old:1.19}}},
+  broetchen:{n:'Aufbackbrötchen',u:'6 Stück',d:12,p:{F:{p:1.79,a:1.19},P:{p:1.19},T:{p:1.39},L:{p:1.25}}},
+  vollkornbrot:{n:'Vollkornbrot',u:'500 g',d:11,p:{F:{p:2.49},P:{p:1.69},T:{p:2.19},L:{p:1.79}}},
+  // Obst und Gemüse
+  aepfel:{n:'Äpfel Elstar',u:'1 kg',d:21,p:{F:{p:1.99,old:2.99},P:{p:2.49},T:{p:2.79},L:{p:2.29}}},
+  kartoffeln:{n:'Kartoffeln festkochend',u:'2 kg',d:19,p:{F:{p:3.49},P:{p:2.29,old:2.79},T:{p:2.99},L:{p:2.49}}},
+  karotten:{n:'Karotten',u:'1 kg',d:14,p:{F:{p:1.29},P:{p:.99},T:{p:1.19},L:{p:.89}}},
+  gurke:{n:'Salatgurke',u:'1 Stück',d:15,p:{F:{p:.89},P:{p:.69},T:{p:.79},L:{p:.59,old:.79}}},
+  rispentomaten:{n:'Rispentomaten',u:'500 g',d:17,p:{F:{p:2.29},P:{p:1.79},T:{p:1.99},L:{p:1.69}}},
+  zitronen:{n:'Zitronen',u:'500 g',d:7,p:{F:{p:1.49},P:{p:1.19},T:{p:1.39},L:{p:1.09}}},
+  salat:{n:'Eisbergsalat',u:'1 Stück',d:8,p:{F:{p:1.29},P:{p:.99},T:{p:1.19},L:{p:.95}}},
+  // Fleisch, Fisch und Alternativen
+  lachs:{n:'Lachsfilet',u:'250 g',d:9,p:{F:{p:3.99,old:5.49},P:{p:4.49},T:{p:5.29},L:{p:4.29}}},
+  aufschnitt:{n:'Geflügel-Aufschnitt',u:'150 g',d:12,p:{F:{p:1.79,a:1.19},P:{p:1.19},T:{p:1.49},L:{p:1.25}}},
+  tofu:{n:'Tofu natur',u:'400 g',d:5,p:{F:{p:2.49,a:1.79},P:{p:1.79},T:{p:2.29},L:{p:1.85}}},
+  // Vorratsschrank
+  mehl:{n:'Weizenmehl Type 405',u:'1 kg',d:8,p:{F:{p:.89,a:.59},P:{p:.59},T:{p:.79},L:{p:.55}}},
+  zucker:{n:'Zucker',u:'1 kg',d:6,p:{F:{p:1.29,a:.99},P:{p:.99},T:{p:1.19},L:{p:.95}}},
+  penne:{n:'Penne Rigate',u:'500 g',d:13,p:{F:{p:1.49,a:.79},P:{p:.69,old:.89},T:{p:.99},L:{p:.75}}},
+  muesli:{n:'Früchtemüsli',u:'750 g',d:9,p:{F:{p:3.49,a:1.99},P:{p:1.99},T:{p:2.79},L:{p:2.09}}},
+  olivenoel:{n:'Olivenöl nativ extra',u:'750 ml',d:7,p:{F:{p:8.99,a:6.99},P:{p:6.99},T:{p:7.99},L:{p:6.79,old:7.99}}},
+  linsen:{n:'Rote Linsen',u:'500 g',d:4,p:{F:{p:1.99,a:1.49},P:{p:1.49},T:{p:1.79},L:{p:1.45}}},
+  kidney:{n:'Kidneybohnen',u:'400 g',d:6,p:{F:{p:.99,a:.59},P:{p:.59},T:{p:.79},L:{p:.55}}},
+  nusscreme:{n:'Nuss-Nougat-Creme',u:'450 g',d:10,p:{F:{p:3.49,a:1.99},P:{p:1.99},T:{p:2.99},L:{p:1.89,old:2.29}}},
+  // Getränke
+  wasser:{n:'Mineralwasser medium',u:'6 × 1,5 l',d:18,p:{F:{p:2.99,a:1.74},P:{p:1.74},T:{p:2.49},L:{p:1.74}}},
+  orangensaft:{n:'Orangensaft',u:'1 l',d:9,p:{F:{p:1.99,a:1.29},P:{p:1.29},T:{p:1.69},L:{p:1.35}}},
+  // Tiefkühl
+  pizza:{n:'Tiefkühlpizza Margherita',u:'350 g',d:11,p:{F:{p:2.99,a:1.79},P:{p:1.69,old:1.99},T:{p:2.49},L:{p:1.79}}},
+  erbsen:{n:'Erbsen tiefgekühlt',u:'1 kg',d:6,p:{F:{p:2.49,a:1.69},P:{p:1.69},T:{p:1.99},L:{p:1.75}}},
+  // Süßes und Snacks
+  schokolade:{n:'Vollmilchschokolade',u:'100 g',d:16,p:{F:{p:1.29,a:.89},P:{p:.89},T:{p:1.19},L:{p:.79,old:1.09}}},
+  chips:{n:'Kartoffelchips Paprika',u:'175 g',d:10,p:{F:{p:1.99,a:1.29},P:{p:1.29},T:{p:1.69},L:{p:1.25}}},
+  // Drogerie und Haushalt
+  spuelmittel:{n:'Spülmittel',u:'500 ml',d:7,p:{F:{p:1.49,a:.79},P:{p:.79},T:{p:1.19},L:{p:.75}}},
+  waschmittel:{n:'Flüssigwaschmittel',u:'20 Waschladungen',d:6,p:{F:{p:3.99,old:5.99},P:{p:3.49},T:{p:4.99},L:{p:3.29}}},
+  zahnpasta:{n:'Zahnpasta',u:'75 ml',d:5,p:{F:{p:1.49,a:.79},P:{p:.79},T:{p:1.29},L:{p:.75}}},
+  kuechenrolle:{n:'Küchenrolle',u:'4 Rollen',d:8,p:{F:{p:2.99,a:1.99},P:{p:1.99},T:{p:2.49},L:{p:1.95}}}
 };
+// Haltbarkeit nach dem Kauf in Tagen (null = Haushaltsartikel ohne Ablaufdatum)
+const SHELF={milch:10,spaghetti:365,haehnchen:3,paprika:10,kaffee:180,butter:30,joghurt:21,bananen:7,eier:21,tomaten:365,gouda:21,klopapier:null,reis:365,zwiebeln:30,mozzarella:14,haferflocken:365,wraps:30,hack:2,apfelsaft:180,
+  quark:21,sahne:14,frischkaese:21,hafermilch:180,toast:7,broetchen:30,vollkornbrot:6,aepfel:21,kartoffeln:30,karotten:21,gurke:7,rispentomaten:7,zitronen:21,salat:5,
+  lachs:2,aufschnitt:7,tofu:21,mehl:365,zucker:730,penne:365,muesli:180,olivenoel:365,linsen:365,kidney:730,nusscreme:270,wasser:365,orangensaft:180,
+  pizza:180,erbsen:365,schokolade:270,chips:120,spuelmittel:null,waschmittel:null,zahnpasta:null,kuechenrolle:null};
+// Bisheriges Kaufverhalten (Demo): every = typischer Abstand zwischen zwei Käufen in Tagen, last = letzter Kauf vor x Tagen
+const HIST={milch:[7,6],spaghetti:[14,15],haehnchen:[10,11],paprika:[10,9],kaffee:[21,22],butter:[14,14],joghurt:[7,8],bananen:[7,7],eier:[10,11],tomaten:[14,16],gouda:[14,13],klopapier:[28,30],reis:[45,20],zwiebeln:[21,10],mozzarella:[14,5],haferflocken:[30,25],wraps:[14,13],hack:[14,12],apfelsaft:[14,15],
+  aepfel:[10,9],toast:[7,3],quark:[14,6],kartoffeln:[21,8],karotten:[14,5],gurke:[7,2],wasser:[14,6],schokolade:[14,4],spuelmittel:[45,20],kuechenrolle:[30,12],nusscreme:[30,10],orangensaft:[14,5]};
 // Regulärer Preis des Händlers (für Angebote im Backend)
 const REG={};Object.keys(CAT).forEach(id=>{const o=CAT[id].p[ME];REG[id]=o.old||o.p});
 const LISTS=48200; // aktive Listen im Einzugsgebiet pro Woche (Demo)
@@ -435,6 +514,7 @@ const I={
   home:'<path d="M3 11l9-7 9 7v9H3z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/>',
   doc:'<path d="M6 3h9l4 4v14H6z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/><path d="M9 12h7M9 16h7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
   mega:'<path d="M3 10v4h4l8 5V5L7 10z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/><path d="M18 9a4 4 0 0 1 0 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>',
+  trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>',
   chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/>'
 };
 const svg=k=>`<svg viewBox="0 0 24 24" aria-hidden="true">${I[k]}</svg>`;
@@ -460,12 +540,73 @@ const S={
   list:START.map(id=>({id,q:1,lock:false})),
   alts:true,mode:'auto',storeFilter:'alle',
   month:38.60,weeks:[8.20,11.40,9.70,9.30],year:312.40,km:14.6,rescued:1.2,
+  // Vorrat: id verweist auf den Katalog, n überschreibt den Anzeigenamen (z. B. andere Sorte), d = noch haltbar in Tagen
   pantry:[
-    {n:'Mozzarella 125 g',d:2,max:14},{n:'Naturjoghurt 500 g',d:3,max:21},{n:'Paprika gelb 500 g',d:4,max:10},
-    {n:'Zwiebeln 1 kg',d:20,max:30},{n:'Basmati-Reis 1 kg',d:180,max:365},{n:'Haferflocken 500 g',d:120,max:365}
+    {id:'mozzarella',q:1,d:2,max:14},{id:'joghurt',q:1,d:3,max:21},{id:'paprika',n:'Paprika gelb 500 g',q:1,d:4,max:10},
+    {id:'zwiebeln',q:1,d:20,max:30},{id:'reis',q:1,d:180,max:365},{id:'haferflocken',q:1,d:120,max:365}
   ],
+  hist:Object.fromEntries(Object.entries(HIST).map(([id,[every,last]])=>[id,{every,last}])),
+  dismissed:[],lastTrip:null,scanned:false,wasted:0,usedUp:[],
   done:false
 };
+
+/* ---------- Vorrat und Vorschläge ---------- */
+const pName=p=>p.n||CAT[p.id].n+' '+CAT[p.id].u;
+const days=n=>n===1?'1 Tag':n+' Tage';
+function rhythm(d){
+  if(d===7)return 'jede Woche';
+  if(d%7===0)return 'alle '+d/7+' Wochen';
+  if(d>=28&&d<=31)return 'etwa jeden Monat';
+  return 'alle '+d+' Tage';
+}
+// Gekaufte Artikel in den Vorrat buchen. Ältere Packungen bleiben ein eigener Eintrag, damit ihr Ablaufdatum sichtbar bleibt.
+function book(id,q){
+  const sh=SHELF[id];
+  const p=S.pantry.find(x=>x.id===id&&!x.n&&x.neu);
+  if(p)p.q+=q;
+  else S.pantry.push({id,q,d:sh,max:sh,neu:true});
+  if(S.hist[id])S.hist[id].last=0;
+  S.usedUp=S.usedUp.filter(x=>x!==id);
+}
+// Artikel aus dem Vorrat austragen (verbraucht oder entsorgt)
+function takeOut(i){
+  const p=S.pantry.splice(i,1)[0];
+  if(!S.pantry.some(x=>x.id===p.id)&&!S.usedUp.includes(p.id))S.usedUp.push(p.id);
+  return p;
+}
+// Gewicht bzw. Volumen einer Packung in kg (für „Lebensmittel vor dem Ablauf verbraucht“)
+function kgOf(id){
+  const m=/^([\d,]+)\s*(kg|g|l|ml)$/.exec(CAT[id].u);if(!m)return 0;
+  const v=parseFloat(m[1].replace(',','.'));
+  return m[2]==='g'||m[2]==='ml'?v/1000:v;
+}
+// Hinweis, wenn ein ausgetragener Artikel jetzt vorgeschlagen wird
+const suggNote=id=>suggestions().some(x=>x.id===id)?' Jetzt in den Vorschlägen für die Liste.':'';
+// Bestes Angebot der Woche für einen Artikel
+function bestDeal(id){
+  let b=null;
+  SK.forEach(s=>{const o=CAT[id].p[s];if(o.old&&(!b||o.p<b.p))b={s,p:o.p,pct:Math.round((1-o.p/o.old)*100)}});
+  return b;
+}
+// Vorschläge aus Vorrat und bisherigem Kaufverhalten
+function suggestions(){
+  const out=[];
+  Object.entries(S.hist).forEach(([id,h])=>{
+    if(S.list.some(e=>e.id===id)||S.dismissed.includes(id))return;
+    const inP=S.pantry.filter(p=>p.id===id);
+    const fresh=inP.length?Math.max(...inP.map(p=>p.d==null?Infinity:p.d)):null;
+    const ratio=h.last/h.every;
+    let why=null,score=0;
+    if(!inP.length&&S.usedUp.includes(id)){why=`Aufgebraucht · kaufst du ${rhythm(h.every)}`;score=1.2+ratio}
+    else if(!inP.length&&ratio>=.8){why=`Nicht im Vorrat · kaufst du ${rhythm(h.every)}`;score=ratio+.5}
+    else if(inP.length&&fresh<=2&&ratio>=.5){why=`Im Vorrat nur noch ${days(fresh)} haltbar`;score=ratio+.3}
+    else if(inP.length&&ratio>=.9){why=`Bald aufgebraucht · zuletzt vor ${days(h.last)} gekauft`;score=ratio}
+    if(!why)return;
+    const deal=bestDeal(id);if(deal)score+=.3;
+    out.push({id,why,deal,score});
+  });
+  return out.sort((a,b)=>b.score-a.score).slice(0,4);
+}
 
 function eff(entry,s,useAlts){
   const o=CAT[entry.id].p[s];
@@ -513,6 +654,7 @@ function vListe(){
   const opts=Object.entries(CAT).filter(([id])=>!S.list.some(e=>e.id===id)).map(([,c])=>`<option value="${c.n}">`).join('');
   return `
   <div><h2 class="t">Einkaufsliste</h2><p class="sub">Wocheneinkauf · ${S.list.length} Artikel</p></div>
+  ${S.lastTrip&&!S.list.length?`<div class="card donecard"><div class="grow"><b>Einkauf erledigt ✓</b><div>${S.lastTrip.n} Artikel sind jetzt im Vorrat · ${eur(S.lastTrip.save)} gespart</div></div><button class="smallbtn" data-go="vorrat">Vorrat ansehen</button></div>`:''}
   <form class="addbar" id="addform" autocomplete="off">
     <input id="addinput" list="catlist" placeholder="z. B. Reis, Mozzarella, Wraps" aria-label="Artikel hinzufügen">
     <datalist id="catlist">${opts}</datalist>
@@ -524,7 +666,8 @@ function vListe(){
     <li><div class="grow"><div class="nm">${c.n}</div><div class="u">${c.u}${e.lock?' · Marke fixiert':''}</div></div>
       <button class="lock" data-lock="${i}" aria-pressed="${e.lock}" aria-label="Marke fixieren" title="Marke fixieren: keine KI-Alternative">${svg(e.lock?'lockC':'lockO')}</button>
       <div class="qty num"><button data-q="${i}" data-d="-1" aria-label="weniger">−</button><span>${e.q}</span><button data-q="${i}" data-d="1" aria-label="mehr">+</button></div>
-    </li>`}).join('')||'<li class="hint">Die Liste ist leer. Füge oben Artikel hinzu.</li>'}</ul></div>
+    </li>`}).join('')||'<li class="hint">Die Liste ist leer. Füge oben Artikel hinzu oder übernimm einen Vorschlag.</li>'}</ul></div>
+  ${vVorschlaege()}
   <div class="card" style="display:flex;flex-direction:column;gap:12px">
     <div class="switchrow"><div><b>KI-Alternativen</b><div class="hint">Eigenmarken mit gleichem Grundpreis-Nutzen vorschlagen</div></div>
       <button class="switch" role="switch" id="altsw" aria-checked="${S.alts}" aria-label="KI-Alternativen"></button></div>
@@ -532,6 +675,19 @@ function vListe(){
       <div class="seg">${Object.entries(MODES).map(([k,m])=>`<button data-mode="${k}" aria-pressed="${S.mode===k}">${m.l}</button>`).join('')}</div></div>
   </div>
   <button class="cta" data-go="ergebnis" ${S.list.length?'':'disabled'}>Günstigsten Einkauf finden</button>`;
+}
+
+function vVorschlaege(){
+  const sg=suggestions();
+  if(!sg.length)return '';
+  return `<div class="card sugg">
+    <div class="row" style="align-items:flex-start"><div class="grow"><b>Vorschläge für dich</b><div class="hint">Aus deinem Vorrat und deinen bisherigen Einkäufen</div></div>
+      ${sg.length>1?'<button class="smallbtn" id="suggall">Alle hinzufügen</button>':''}</div>
+    <ul class="items">${sg.map(x=>{const c=CAT[x.id];return `<li>
+      <div class="grow"><div class="nm">${c.n}${x.deal?`<span class="badge b-deal">Angebot −${x.deal.pct} %</span>`:''}</div>
+        <div class="u">${x.why}${x.deal?' · '+STORES[x.deal.s].name+' '+eur(x.deal.p):''}</div></div>
+      <button class="iconbtn sm" data-sugg="${x.id}" aria-label="${c.n} auf die Liste">${svg('plus')}</button>
+      <button class="xbtn" data-dismiss="${x.id}" aria-label="Vorschlag ${c.n} ausblenden" title="Ausblenden">×</button></li>`}).join('')}</ul></div>`;
 }
 
 function vErgebnis(){
@@ -592,13 +748,16 @@ function vAngebote(){
 }
 
 function vVorrat(){
-  const soon=S.pantry.filter(p=>p.d<=3);
+  const soon=S.pantry.filter(p=>p.d!=null&&p.d<=3);
+  const nNeu=S.pantry.filter(p=>p.neu).length;
+  const sorted=S.pantry.slice().sort((a,b)=>(a.d==null?1e9:a.d)-(b.d==null?1e9:b.d));
   return `
-  <div><h2 class="t">Vorrat</h2><p class="sub">${S.pantry.length} Produkte zu Hause</p></div>
-  ${soon.length?`<div class="alert">${soon.map(p=>p.n).join(' und ')} ${soon.length>1?'laufen':'läuft'} in den nächsten Tagen ab. Passende Rezepte stehen unter „Rezepte".</div>`:''}
-  <div class="card"><ul class="items">${S.pantry.slice().sort((a,b)=>a.d-b.d).map(p=>{const pc=Math.max(6,Math.min(100,p.d/p.max*100));const col=p.d<=3?'var(--warn)':p.d<=7?'var(--orange)':'var(--green)';return `
-    <li><div class="grow"><div class="nm">${p.n}</div><div class="u num">${p.d===1?'noch 1 Tag':'noch '+p.d+' Tage'}</div><div class="exp"><i style="width:${pc}%;background:${col}"></i></div></div></li>`}).join('')}</ul></div>
-  <button class="cta alt" id="scan">Kassenbon scannen</button>
+  <div><h2 class="t">Vorrat</h2><p class="sub">${S.pantry.length} Produkte zu Hause${nNeu?' · '+nNeu+' neu gebucht':''}</p></div>
+  ${soon.length?`<div class="alert">${(n=>n.length>1?n.slice(0,-1).join(', ')+' und '+n[n.length-1]:n[0])(soon.map(pName))} ${soon.length>1?'laufen':'läuft'} in den nächsten Tagen ab. Passende Rezepte stehen unter „Rezepte".</div>`:''}
+  <div class="card"><ul class="items">${sorted.map(p=>{const i=S.pantry.indexOf(p),nm=pName(p),nf=p.d==null;const pc=nf?100:Math.max(6,Math.min(100,p.d/p.max*100));const col=nf?'var(--green)':p.d<=3?'var(--warn)':p.d<=7?'var(--orange)':'var(--green)';return `
+    <li><div class="grow"><div class="nm">${nm}${p.neu?'<span class="badge b-ai">Neu</span>':''}</div><div class="u num">${nf?'Haushaltsartikel · kein Ablaufdatum':p.d<=0?'abgelaufen':'noch '+days(p.d)}</div><div class="exp"><i style="width:${pc}%;background:${col}"></i></div></div>
+      <div class="qty num"><button data-pq="${i}" data-d="-1" aria-label="${nm}: eins verbraucht" title="Eins verbraucht">−</button><span>${p.q}</span><button data-pq="${i}" data-d="1" aria-label="${nm}: eins mehr">+</button></div>
+      <button class="lock" data-pdel="${i}" aria-label="${nm} entsorgen" title="Entsorgt oder abgelaufen">${svg('trash')}</button></li>`}).join('')||'<li class="hint">Der Vorrat ist leer.</li>'}</ul></div>  <button class="cta alt" id="scan">Kassenbon scannen</button>
   <p class="demo-note">Nach dem Scan bucht die App die gekauften Produkte automatisch in den Vorrat.</p>`;
 }
 
@@ -636,7 +795,7 @@ function vTacho(){
     <div class="stat"><b class="num">${S.rescued.toLocaleString('de-DE',{minimumFractionDigits:1})} kg</b><span>Lebensmittel vor dem Ablauf verbraucht</span></div>
     <div class="stat"><b>Platz 12</b><span>von 340 in der Spar-Challenge Köln</span></div>
   </div>
-  <div class="share"><b>„Ich habe dieses Jahr ${eur(S.year)} gespart."</b><span style="font-size:13.5px">Teile deine Kachel. Wer sich über deinen Link anmeldet, bekommt einen Monat Premium, du auch.</span><button id="sharebtn">Kachel teilen</button></div>`;
+  <div class="share"><b>„Ich habe dieses Jahr ${eur(S.year)} gespart."</b><span style="font-size:13.5px">Teile deine Kachel. Wer sich über deinen Link anmeldet, bekommt einen 2-€-Einkaufsgutschein von einem Partnermarkt, du auch.</span><button id="sharebtn">Kachel teilen</button></div>`;
 }
 
 function render(){
@@ -707,7 +866,7 @@ function beUebersicht(){
     <button class="btn" data-go="angebote">In der Kunden-App ansehen</button></div>
   <div class="kpis num">
     <div class="kpi"><div class="v">${int(LISTS)}</div><div class="l">aktive Einkaufslisten im Einzugsgebiet</div><div class="d up">+6 % ggü. Vorwoche</div></div>
-    <div class="kpi"><div class="v">${int(wins)}</div><div class="l">Artikel auf Listen, bei denen Tagwerk am günstigsten ist</div><div class="d up">KorbKlug empfiehlt Ihren Markt</div></div>
+    <div class="kpi"><div class="v">${int(wins)}</div><div class="l">Artikel auf Listen, bei denen Tagwerk am günstigsten ist</div><div class="d up">Savr Cart empfiehlt Ihren Markt</div></div>
     <div class="kpi"><div class="v">${offersN}</div><div class="l">aktive Angebote im Prospekt</div><div class="d">${act.length} davon gesponsert</div></div>
     <div class="kpi"><div class="v">${int(red)}</div><div class="l">Einlösungen über Kampagnen</div><div class="d">Kosten ${eur(red*0.25)}</div></div>
   </div>
@@ -752,7 +911,7 @@ function beAngebote(){
       <td class="r">${eur(cm.minOther)} <span class="hint">${STORES[other.s].name}</span></td>
       <td class="r"><span class="rank ${cm.rank===1?'r1':''}">${cm.rank}</span></td></tr>`}).join('')}</tbody>
   </table></div>
-  <p class="fine">Rang 1 bedeutet: KorbKlug empfiehlt Tagwerk für diesen Artikel. Verglichen wird mit dem günstigsten gleichwertigen Produkt, also auch mit Eigenmarken.</p>`;
+  <p class="fine">Rang 1 bedeutet: Savr Cart empfiehlt Tagwerk für diesen Artikel. Verglichen wird mit dem günstigsten gleichwertigen Produkt, also auch mit Eigenmarken.</p>`;
 }
 
 function beKampagnen(){
@@ -790,7 +949,7 @@ function beNachfrage(){
   const needed=cm.minOther-0.01;
   const maxP=Math.max(reg*1.1,cur),minP=Math.max(reg*.4,0.1);
   return `
-  <div class="be-head"><div><h1>Nachfrage &amp; Preise</h1><p>Preis-Simulator: Ab welchem Preis empfiehlt KorbKlug Ihren Markt?</p></div></div>
+  <div class="be-head"><div><h1>Nachfrage &amp; Preise</h1><p>Preis-Simulator: Ab welchem Preis empfiehlt Savr Cart Ihren Markt?</p></div></div>
   <div class="sim">
     <div class="box">
       <h3>Artikel und Preis</h3>
@@ -807,7 +966,7 @@ function beNachfrage(){
       </div>
     </div>
     <div class="box simout">
-      <h3>Wirkung in KorbKlug</h3>
+      <h3>Wirkung in Savr Cart</h3>
       <div class="simrow"><span>Ihr Rang bei ${c.n}</span><b><span class="rank ${cm.rank===1?'r1':''}">${cm.rank}</span></b></div>
       <div class="simrow"><span>Listen, auf denen Tagwerk empfohlen wird</span><b class="num">${int(wins)}</b></div>
       <div class="simrow"><span>Rabatt ggü. Normalpreis</span><b class="num">${price<reg?Math.round((1-price/reg)*100)+' %':'kein Angebot'}</b></div>
@@ -845,10 +1004,32 @@ document.addEventListener('click',ev=>{
     const A=analyse(),save=Math.max(A.baseline-A.chosen.net,0);
     S.month+=save;S.year+=save;S.weeks[3]+=save;S.done=true;
     if(!A.goPair&&A.bp)S.km+=Math.max(A.bp.km-A.bs.km,0);
-    render();toast(eur(save)+' zum Spar-Tacho hinzugefügt.');return}
+    // Gekaufte Artikel in den Vorrat buchen, Kaufverlauf aktualisieren, Liste leeren
+    S.pantry.forEach(p=>p.neu=false);
+    S.list.forEach(e=>book(e.id,e.q));
+    S.lastTrip={n:S.list.length,save};
+    S.list=[];S.done=false;S.dismissed=[];
+    go('liste');toast(eur(save)+' gespart · Einkauf im Vorrat gebucht.');return}
+  if(b.dataset.sugg){const id=b.dataset.sugg;if(addItem(id)){render();toast(CAT[id].n+' steht jetzt auf der Liste.')}return}
+  if(b.dataset.dismiss){S.dismissed.push(b.dataset.dismiss);render();return}
+  if(b.id==='suggall'){const sg=suggestions();sg.forEach(x=>addItem(x.id));render();toast(sg.length+' Vorschläge auf die Liste gesetzt.');return}
+  if(b.dataset.pq!=null){
+    const i=+b.dataset.pq,p=S.pantry[i],nm=pName(p);
+    p.q+=+b.dataset.d;
+    if(p.q>=1){render();return}
+    // Letzte Packung verbraucht: aus dem Vorrat nehmen, rechtzeitig Verbrauchtes zählt für den Spar-Tacho
+    takeOut(i);
+    if(p.d!=null&&p.d<=3)S.rescued+=kgOf(p.id);
+    render();toast(nm+' verbraucht und ausgetragen.'+suggNote(p.id));return}
+  if(b.dataset.pdel!=null){
+    const i=+b.dataset.pdel,p=S.pantry[i],nm=pName(p);
+    takeOut(i);S.wasted++;
+    render();toast(nm+' als entsorgt ausgetragen.'+suggNote(p.id));return}
   if(b.id==='scan'){
-    const add=[{n:'Hähnchenbrustfilet 600 g',d:3,max:6},{n:'Bananen 1 kg',d:6,max:8}].filter(x=>!S.pantry.some(p=>p.n===x.n));
-    S.pantry.push(...add);render();toast(add.length?'Bon erkannt: '+add.length+' Produkte in den Vorrat gebucht.':'Dieser Bon wurde schon gebucht.');return}
+    if(S.scanned){toast('Dieser Bon wurde schon gebucht.');return}
+    S.pantry.forEach(p=>p.neu=false);
+    book('haehnchen',1);book('bananen',1);S.scanned=true;
+    render();toast('Bon erkannt: 2 Produkte in den Vorrat gebucht.');return}
   if(b.id==='sharebtn')return toast('Deine Kachel ist bereit zum Teilen.');
   // Backend
   if(b.dataset.sim){B.simItem=b.dataset.sim;B.simPrice=null;goBE('nachfrage');return}
@@ -889,8 +1070,10 @@ document.addEventListener('submit',ev=>{
   ev.preventDefault();
   if(ev.target.id==='addform'){
     const v=document.getElementById('addinput').value.trim().toLowerCase();if(!v)return;
-    const hit=Object.entries(CAT).find(([id,c])=>c.n.toLowerCase().includes(v)||id.includes(v));
-    if(!hit){toast('Nicht gefunden. Probier Reis, Mozzarella, Wraps oder Hackfleisch.');return}
+    // Treffer nach Güte: exakter Name, Name beginnt mit Eingabe, Eingabe irgendwo im Namen
+    const E=Object.entries(CAT),lc=c=>c.n.toLowerCase();
+    const hit=E.find(([,c])=>lc(c)===v)||E.find(([id,c])=>lc(c).startsWith(v)||id.startsWith(v))||E.find(([id,c])=>lc(c).includes(v)||id.includes(v));
+    if(!hit){toast('Nicht gefunden. Probier Reis, Lachs, Äpfel oder Spülmittel.');return}
     if(addItem(hit[0])){render();toast(hit[1].n+' hinzugefügt.');document.getElementById('addinput')?.focus()}
     return}
   if(ev.target.id==='campform'){
