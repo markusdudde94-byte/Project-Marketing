@@ -134,6 +134,11 @@ h2.t{font-family:var(--display);font-weight:800;font-size:24px;margin:2px 0 0;le
 .opts{display:flex;flex-direction:column;gap:6px}
 .opt{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
 .opt.best{border-color:var(--green);box-shadow:inset 0 0 0 1px var(--green)}
+button.opt{width:100%;text-align:left;font:inherit;color:inherit;cursor:pointer;transition:border-color .15s}
+button.opt:hover{border-color:var(--green)}
+.pickcard{display:flex;align-items:center;gap:10px;background:var(--orange-soft);border-color:transparent;color:var(--orange-ink);font-size:13.5px}
+.pickcard b{font-size:15px}
+.linkbtn{border:0;background:none;color:var(--green);font-weight:700;font-size:13.5px;padding:10px 2px 0;cursor:pointer}
 .opt .o1{font-weight:700}
 .opt .o2{font-size:12.5px;color:var(--muted)}
 .opt .o3{font-weight:700;text-align:right}
@@ -159,7 +164,28 @@ h2.t{font-family:var(--display);font-weight:800;font-size:24px;margin:2px 0 0;le
 .exp{height:6px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:4px}
 .exp i{display:block;height:100%;border-radius:4px}
 .alert{background:var(--warn-soft);color:var(--warn);border-radius:12px;padding:10px 12px;font-size:13.5px;font-weight:600}
-.recipe{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.recipe{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;flex:none}
+/* Premium (nur Rezepte) */
+.b-prem{background:var(--orange);color:#fff}
+.pw-hero{background:var(--ink);color:var(--card);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:8px;flex:none}
+.pw-hero .eb{font-size:12px;text-transform:uppercase;letter-spacing:.09em;font-weight:700;color:var(--orange)}
+.pw-hero b.h{font-family:var(--display);font-weight:800;font-size:24px;line-height:1.1}
+.pw-hero p{margin:0;font-size:14px;opacity:.9}
+.pw-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.pw-list li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+.pw-list li:last-child{border-bottom:0}
+.pw-list .sw{width:34px;height:34px;border-radius:10px;flex:none;display:grid;place-items:center;color:#fff}
+.pw-list .sw svg{width:16px;height:16px}
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.plan{border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:2px}
+.plan[aria-pressed="true"]{border-color:var(--green);box-shadow:inset 0 0 0 1px var(--green)}
+.plan b{font-family:var(--display);font-size:20px;font-weight:800}
+.plan span{font-size:12.5px;color:var(--muted)}
+.plan em{font-style:normal;font-size:11.5px;font-weight:700;color:var(--green-ink)}
+.checks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.checks li{display:flex;gap:8px}
+.checks li::before{content:"✓";color:var(--green);font-weight:800}
+.premrow{display:flex;align-items:center;gap:10px;background:var(--orange-soft);color:var(--orange-ink);border-radius:12px;padding:10px 12px;font-size:13.5px;flex:none}
 .recipe .hero{height:84px;display:flex;align-items:flex-end;padding:10px 12px;font-family:var(--display);font-weight:800;font-size:19px;color:#fff;line-height:1.1}
 .recipe .bd{padding:12px;display:flex;flex-direction:column;gap:8px}
 .tags{display:flex;gap:6px;flex-wrap:wrap}
@@ -370,7 +396,7 @@ body.shot .toast{display:none}
             <span><small>Jetzt bei</small><b>Google Play</b></span>
           </button>
         </div>
-        <p class="hint">Komplett kostenlos, ohne Abo und ohne In-App-Käufe · für iPhone (ab iOS 16) und Android (ab Version 10)</p>
+        <p class="hint">Kostenlos: Liste, Preisvergleich, Angebote, Vorrat und Spar-Tacho · Rezepte mit Premium ab 1,25 € pro Monat · für iPhone (ab iOS 16) und Android (ab Version 10)</p>
       </div>
     </aside>
 
@@ -534,7 +560,7 @@ function setMode(m){
    KUNDEN-APP
    ========================================================= */
 const START=['milch','spaghetti','haehnchen','paprika','kaffee','butter','joghurt','bananen','eier','tomaten','gouda','klopapier'];
-const MODES={auto:{l:'Auto',eur:.30,min:2},rad:{l:'Fahrrad',eur:0,min:4},fuss:{l:'Zu Fuß',eur:0,min:12}};
+const MODES={auto:{l:'Auto',min:2},rad:{l:'Fahrrad',min:4},fuss:{l:'Zu Fuß',min:12}};
 const S={
   view:'liste',
   list:START.map(id=>({id,q:1,lock:false})),
@@ -547,6 +573,7 @@ const S={
   ],
   hist:Object.fromEntries(Object.entries(HIST).map(([id,[every,last]])=>[id,{every,last}])),
   dismissed:[],lastTrip:null,scanned:false,wasted:0,usedUp:[],
+  premium:false,plan:'jahr',
   done:false
 };
 
@@ -627,8 +654,7 @@ function plan(stores,useAlts){
   let d=0;
   if(used.length===1)d=2*dist(HOME,STORES[used[0]]);
   else if(used.length===2)d=dist(HOME,STORES[used[0]])+dist(STORES[used[0]],STORES[used[1]])+dist(STORES[used[1]],HOME);
-  const travel=d*m.eur;
-  return {stores:used,assign,goods,km:d,travel,net:goods+travel,min:Math.round(d*m.min),aiSave};
+  return {stores:used,assign,goods,km:d,net:goods,min:Math.round(d*m.min),aiSave};
 }
 function analyse(){
   const singles=SK.map(s=>plan([s],S.alts));
@@ -690,28 +716,48 @@ function vVorschlaege(){
       <button class="xbtn" data-dismiss="${x.id}" aria-label="Vorschlag ${c.n} ausblenden" title="Ausblenden">×</button></li>`}).join('')}</ul></div>`;
 }
 
+// Eindeutiger Schlüssel einer Option (Märkte sortiert), z. B. "F,L"
+const keyOf=p=>p.stores.slice().sort().join(',');
+// Vom Nutzer gewählte Option suchen; fehlt sie (z. B. Liste geändert), gilt wieder die Empfehlung
+function picked(A){
+  if(!S.pick)return null;
+  return [...A.singles,...A.pairs].find(p=>keyOf(p)===S.pick)||null;
+}
+
 function vErgebnis(){
   if(!S.list.length)return vListe();
-  const A=analyse(),c=A.chosen,m=MODES[S.mode];
-  const names=c.stores.map(s=>STORES[s].name).join(' + ');
+  const A=analyse(),rec=A.chosen,m=MODES[S.mode];
+  const c=picked(A)||rec; // vom Nutzer gewählte Option, sonst die Empfehlung
+  const nameOf=p=>p.stores.map(s=>STORES[s].name).join(' + ');
+  const names=nameOf(rec);
   let reco;
   if(A.goPair){
     reco=`<div class="reco"><div class="eb">Empfehlung · 2 Märkte</div><div class="title">${names}</div>
-      <div class="big num">${eur(c.goods)}</div>
-      <div>${eur(A.bs.goods-c.goods)} günstiger als alles bei ${STORES[A.bs.stores[0]].name}. Nach Abzug des Umwegs bleiben <b>${eur(A.gain)}</b>.</div>
-      <div class="facts num"><span>${km(c.km)} Strecke</span><span>+${km(Math.max(c.km-A.bs.km,0))} Umweg</span><span>${m.eur?'+'+eur(Math.max(c.travel-A.bs.travel,0))+' Fahrtkosten':'keine Fahrtkosten'}</span><span>+${Math.max(A.extraMin,0)} Min.</span></div></div>`;
+      <div class="big num">${eur(rec.goods)}</div>
+      <div><b>${eur(A.gain)}</b> günstiger als alles bei ${STORES[A.bs.stores[0]].name}.</div>
+      <div class="facts num"><span>${km(rec.km)} Strecke</span><span>+${km(Math.max(rec.km-A.bs.km,0))} Umweg</span><span>+${Math.max(A.extraMin,0)} Min.</span></div></div>`;
   }else{
     const how=S.mode==='fuss'?'zu Fuß':'mit dem '+m.l;
     const why=!A.bp?'':(A.gain<1?`Ein zweiter Markt brächte nur ${eur(Math.max(A.gain,0))}.`:`Ein zweiter Markt spart zwar ${eur(A.gain)}, kostet ${how} aber ${A.extraMin} Minuten extra.`);
     reco=`<div class="reco stay"><div class="eb">Empfehlung · 1 Markt</div><div class="title">Alles bei ${names}</div>
-      <div class="big num">${eur(c.goods)}</div>
+      <div class="big num">${eur(rec.goods)}</div>
       <div>${why} Das lohnt sich nicht, bleib bei einem Markt.</div>
-      <div class="facts num"><span>${km(c.km)} Strecke</span><span>ca. ${c.min} Min. unterwegs</span></div></div>`;
+      <div class="facts num"><span>${km(rec.km)} Strecke</span><span>ca. ${rec.min} Min. unterwegs</span></div></div>`;
   }
-  const options=[...A.singles.slice(0,3),...A.pairs.slice(0,2)].sort((a,b)=>a.net-b.net).slice(0,4);
-  const optHtml=options.map(o=>`<div class="opt ${o===c?'best':''}">
-      <div class="o1">${o.stores.map(s=>STORES[s].name).join(' + ')}</div><div class="o3 num">${eur(o.goods)}</div>
-      <div class="o2 num">${km(o.km)} · ca. ${o.min} Min.</div><div class="o4 num">${m.eur?'inkl. Fahrt '+eur(o.net):''}</div></div>`).join('');
+  // Optionen: kompakt die besten 4 (die eigene Wahl immer dabei) oder alle Märkte und Kombinationen
+  const all=[...A.singles,...A.pairs].sort((a,b)=>a.net-b.net);
+  let options=S.allOpts?all:[...A.singles.slice(0,3),...A.pairs.slice(0,2)].sort((a,b)=>a.net-b.net).slice(0,4);
+  if(!options.includes(c))options=[...options.slice(0,3),c].sort((a,b)=>a.net-b.net);
+  const optHtml=options.map(o=>`<button type="button" class="opt ${o===c?'best':''}" data-pick="${keyOf(o)}" aria-pressed="${o===c}">
+      <div class="o1">${nameOf(o)}${o===rec?'<span class="badge b-ai">Empfohlen</span>':''}</div><div class="o3 num">${eur(o.goods)}</div>
+      <div class="o2 num">${km(o.km)} · ca. ${o.min} Min.</div></button>`).join('');
+  let pickHtml='';
+  if(c!==rec){
+    const dEur=c.net-rec.net,dMin=c.min-rec.min;
+    const money=Math.abs(dEur)<.005?'Gleich teuer wie die Empfehlung':eur(Math.abs(dEur))+(dEur>0?' teurer':' günstiger')+' als die Empfehlung';
+    const time=dMin===0?'gleich lange unterwegs':dMin>0?dMin+' Min. länger unterwegs':-dMin+' Min. kürzer unterwegs';
+    pickHtml=`<div class="card pickcard"><div class="grow"><b>Deine Wahl: ${nameOf(c)}</b><div>${money} · ${time}</div></div><button class="smallbtn" id="pickreset">Zur Empfehlung</button></div>`;
+  }
   const lists=c.stores.map(s=>{const st=STORES[s];const rows=c.assign[s];const sum=rows.reduce((a,x)=>a+x.r.price,0);return `
     <div class="card"><div class="storehead"><span class="dot" style="background:${st.c}"></span><b class="grow">${st.name}</b><span class="hint">${st.type} · ${km(dist(HOME,st))}</span></div>
     <ul class="items">${rows.map(({e,r})=>{const cc=CAT[e.id];const disc=r.old?Math.round((1-r.price/r.old)*100):0;return `<li>
@@ -723,11 +769,13 @@ function vErgebnis(){
   return `
   <div class="row"><button class="smallbtn" data-go="liste">← Liste</button><span class="grow"></span><span class="hint">${S.list.length} Artikel · ${m.l}</span></div>
   ${reco}
-  <div><p class="eyebrow" style="margin-bottom:8px">Alle Optionen im Vergleich</p><div class="opts">${optHtml}</div></div>
+  ${pickHtml}
+  <div><p class="eyebrow" style="margin-bottom:4px">Alle Optionen im Vergleich</p><p class="hint" style="margin:0 0 8px">Tippe auf eine Option, um deinen Einkaufszettel anzupassen.</p><div class="opts">${optHtml}</div>
+    <button class="linkbtn" id="allopts">${S.allOpts?'Weniger Optionen anzeigen':'Alle '+all.length+' Märkte und Kombinationen anzeigen'}</button></div>
   ${S.alts&&c.aiSave>0?`<div class="card" style="background:var(--green-soft);border-color:transparent;color:var(--green-ink)"><b>KI-Alternativen sparen ${eur(c.aiSave)}</b><div style="font-size:13.5px">Gleiche Menge, günstigere Eigenmarke. Artikel mit fixierter Marke bleiben unverändert.</div></div>`:''}
   <div><p class="eyebrow" style="margin-bottom:8px">Dein Einkaufszettel</p><div style="display:flex;flex-direction:column;gap:10px">${lists}</div></div>
   <button class="cta" id="finish" ${S.done?'disabled':''}>${S.done?'Einkauf erledigt ✓':'Einkauf abschließen · '+eur(save)+' gespart'}</button>
-  <p class="demo-note">Ersparnis gegenüber dem Durchschnittspreis aller Märkte ohne Vergleich, inklusive Fahrtkosten</p>`;
+  <p class="demo-note">Ersparnis gegenüber dem Durchschnittspreis aller Märkte ohne Vergleich</p>`;
 }
 
 function vAngebote(){
@@ -766,14 +814,37 @@ const RECIPES=[
   {n:'Spaghetti mit Tomaten und Mozzarella',col:'#1F7A4D',por:4,pp:.98,min:20,need:['spaghetti','tomaten'],tags:[['v','Mozzarella läuft in 2 Tagen ab'],['a','Spaghetti im Angebot'],['v','Zwiebeln aus dem Vorrat']]},
   {n:'Overnight Oats mit Banane',col:'#A07808',por:2,pp:.74,min:5,need:['bananen','milch'],tags:[['v','Haferflocken aus dem Vorrat'],['v','Joghurt läuft in 3 Tagen ab'],['a','Bananen im Angebot']]}
 ];
-function vRezepte(){
+// Premium enthält ausschließlich die Rezepte. Alle Spar-Funktionen bleiben kostenlos.
+const PREMIUM={jahr:{price:14.99,label:'pro Jahr',note:'entspricht 1,25 € pro Monat'},monat:{price:1.99,label:'pro Monat',note:'monatlich kündbar'}};
+function vPaywall(){
+  const soon=S.pantry.filter(p=>p.d!=null&&p.d<=3).map(p=>CAT[p.id].n);
+  const minPP=Math.min(...RECIPES.map(r=>r.pp));
   return `
-  <div><h2 class="t">Rezepte der Woche</h2><p class="sub">Aus aktuellen Angeboten und deinem Vorrat</p></div>
+  <div><h2 class="t">Rezepte der Woche<span class="badge b-prem">Premium</span></h2><p class="sub">Aus aktuellen Angeboten und deinem Vorrat</p></div>
+  <div class="pw-hero"><span class="eb">Savr Cart Premium</span><b class="h">Koch, was gerade günstig ist.</b>
+    <p>Diese Woche warten ${RECIPES.length} Rezepte ab ${eur(minPP)} pro Portion auf dich${soon.length?'. '+soon.join(' und ')+' aus deinem Vorrat '+(soon.length>1?'werden':'wird')+' zuerst verplant':''}.</p></div>
+  <div class="card"><ul class="pw-list">${RECIPES.map(r=>`<li><span class="sw" style="background:${r.col}">${svg('lockC')}</span>
+    <div class="grow"><div class="nm" style="font-weight:600">${r.n}</div><div class="u num" style="font-size:12.5px;color:var(--muted)">${eur(r.pp)} pro Portion · ${r.min} Min.</div></div></li>`).join('')}</ul></div>
+  <div class="card"><ul class="checks">
+    <li>Rezepte aus den Angeboten der Woche und deinem Vorrat</li>
+    <li>Kosten pro Portion auf den Cent genau</li>
+    <li>Fehlende Zutaten mit einem Tipp auf der Liste</li>
+    <li>Ohne Werbung in den Rezepten</li></ul></div>
+  <div class="plans">${Object.entries(PREMIUM).map(([k,p])=>`<button class="plan" data-plan="${k}" aria-pressed="${S.plan===k}">
+    <b class="num">${eur(p.price)}</b><span>${p.label}</span><em>${p.note}</em></button>`).join('')}</div>
+  <button class="cta" id="premstart">14 Tage kostenlos testen</button>
+  <p class="demo-note">Danach ${eur(PREMIUM[S.plan].price)} ${PREMIUM[S.plan].label}, jederzeit kündbar. Einkaufsliste, Preisvergleich, Angebote, Vorrat und Spar-Tacho bleiben immer kostenlos.</p>`;
+}
+function vRezepte(){
+  if(!S.premium)return vPaywall();
+  return `
+  <div><h2 class="t">Rezepte der Woche<span class="badge b-prem">Premium</span></h2><p class="sub">Aus aktuellen Angeboten und deinem Vorrat</p></div>
   ${RECIPES.map((r,i)=>{const miss=r.need.filter(id=>!S.list.some(e=>e.id===id));return `
     <div class="recipe"><div class="hero" style="background:linear-gradient(160deg,${r.col},${r.col}cc)">${r.n}</div>
     <div class="bd"><div class="row num" style="gap:14px;font-size:13.5px"><b>${eur(r.pp)} pro Portion</b><span class="hint">${r.por} Portionen · ${r.min} Min.</span></div>
       <div class="tags">${r.tags.map(([t,l])=>`<span class="tag ${t}">${l}</span>`).join('')}</div>
-      <button class="smallbtn" data-recipe="${i}" ${miss.length?'':'disabled'}>${miss.length?'Fehlende Zutaten auf die Liste ('+miss.length+')':'Alle Zutaten auf der Liste ✓'}</button></div></div>`}).join('')}`;
+      <button class="smallbtn" data-recipe="${i}" ${miss.length?'':'disabled'}>${miss.length?'Fehlende Zutaten auf die Liste ('+miss.length+')':'Alle Zutaten auf der Liste ✓'}</button></div></div>`}).join('')}
+  <div class="premrow"><div class="grow"><b>Premium aktiv</b> · 14 Tage kostenlos, danach ${eur(PREMIUM[S.plan].price)} ${PREMIUM[S.plan].label}</div><button class="smallbtn" id="premstop">Kündigen</button></div>`;
 }
 
 function vTacho(){
@@ -999,11 +1070,22 @@ document.addEventListener('click',ev=>{
   if(b.dataset.mode){S.mode=b.dataset.mode;S.done=false;render();return}
   if(b.dataset.sf){S.storeFilter=b.dataset.sf;render();return}
   if(b.dataset.addid){if(addItem(b.dataset.addid)){render();toast(CAT[b.dataset.addid].n+' steht jetzt auf der Liste.')}return}
+  if(b.dataset.plan){S.plan=b.dataset.plan;render();return}
+  if(b.id==='premstart'){S.premium=true;render();document.getElementById('view').scrollTop=0;toast('Premium ist aktiv. Die ersten 14 Tage sind kostenlos.');return}
+  if(b.id==='premstop'){S.premium=false;render();document.getElementById('view').scrollTop=0;toast('Premium gekündigt. Alle Spar-Funktionen bleiben kostenlos.');return}
   if(b.dataset.recipe!=null){const r=RECIPES[+b.dataset.recipe];let n=0;r.need.forEach(id=>{if(!S.list.some(e=>e.id===id)){S.list.push({id,q:1,lock:false});n++}});S.done=false;render();toast(n+(n===1?' Zutat':' Zutaten')+' hinzugefügt.');return}
+  if(b.dataset.pick){
+    const A=analyse(),rec=A.chosen;
+    S.pick=b.dataset.pick===keyOf(rec)?null:b.dataset.pick;S.done=false;render();
+    const c=picked(A)||rec;
+    toast(S.pick?'Einkaufszettel für '+c.stores.map(s=>STORES[s].name).join(' + ')+' angepasst.':'Zurück zur Empfehlung.');return}
+  if(b.id==='pickreset'){S.pick=null;S.done=false;render();toast('Zurück zur Empfehlung.');return}
+  if(b.id==='allopts'){S.allOpts=!S.allOpts;render();return}
   if(b.id==='finish'){
-    const A=analyse(),save=Math.max(A.baseline-A.chosen.net,0);
+    const A=analyse(),cur=picked(A)||A.chosen,save=Math.max(A.baseline-cur.net,0);S.pick=null;
     S.month+=save;S.year+=save;S.weeks[3]+=save;S.done=true;
-    if(!A.goPair&&A.bp)S.km+=Math.max(A.bp.km-A.bs.km,0);
+    // Vermiedener Umweg zählt nur, wenn wirklich nur ein Markt angefahren wird
+    if(!A.goPair&&A.bp&&cur.stores.length===1)S.km+=Math.max(A.bp.km-cur.km,0);
     // Gekaufte Artikel in den Vorrat buchen, Kaufverlauf aktualisieren, Liste leeren
     S.pantry.forEach(p=>p.neu=false);
     S.list.forEach(e=>book(e.id,e.q));
@@ -1088,6 +1170,7 @@ function fromHash(){
   const h=(location.hash||'').slice(1);
   if(h==='haendler'||h==='backend'){render();goBE('uebersicht');return}
   if(h.startsWith('backend-')){const v=h.slice(8);render();if(BE_NAV.some(x=>x[0]===v)){goBE(v)}else goBE('uebersicht');return}
+  if(h==='rezepte-premium'){S.premium=true;go('rezepte');return}
   if(['liste','ergebnis','ergebnis-fuss','angebote','vorrat','rezepte','tacho'].includes(h))go(h);else render();
 }
 window.addEventListener('hashchange',fromHash);
